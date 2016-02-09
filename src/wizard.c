@@ -9,6 +9,7 @@
 
 #include "hack.h"
 #include "qtext.h"
+#include "sql.h"
 
 extern const int monstr[];
 
@@ -654,6 +655,12 @@ void
 wizdead()
 {
     context.no_of_wizards--;
+    if(0 == context.no_of_wizards) {
+        if(FALSE == context.wizard_killed) {
+            sql_complete_objective("kill", "wizard");
+        }
+        context.wizard_killed = TRUE;
+    }
     if (!u.uevent.udemigod) {
         u.uevent.udemigod = TRUE;
         u.udg_cnt = rn1(250, 50);

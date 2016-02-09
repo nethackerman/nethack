@@ -67,6 +67,7 @@ typedef struct mi {
 #define NHW_MAP 3
 #define NHW_MENU 4
 #define NHW_TEXT 5
+#define NHW_COMM 7
 
 /* attribute types for putstr; the same as the ANSI value, for convenience */
 #define ATR_NONE 0

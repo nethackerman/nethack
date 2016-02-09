@@ -10,10 +10,10 @@
 # and Makefiles.
 
 
-PREFIX=/usr
-HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+PREFIX=$(HOME)/nethack_server
+HACKDIR=$(PREFIX)/nh360
 INSTDIR=$(HACKDIR)
-VARDIR=$(HACKDIR)
+VARDIR=$(HACKDIR)/var
 SHELLDIR=$(PREFIX)/games
 
 CFLAGS=-O -I../include
@@ -23,13 +23,13 @@ WINSRC = $(WINTTYSRC)
 WINOBJ = $(WINTTYOBJ)
 WINLIB = $(WINTTYLIB)
 
-WINTTYLIB=-ltermlib
+WINTTYLIB=-lncurses -lmysqlclient
 
 CHOWN=chown
 CHGRP=chgrp
 
-GAMEUID  = games
-GAMEGRP  = bin
+GAMEUID  = $(USER)
+GAMEGRP  = users # $(USER)
 
 GAMEPERM = 04755
 VARFILEPERM = 0644

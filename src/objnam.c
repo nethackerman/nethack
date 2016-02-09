@@ -907,6 +907,10 @@ boolean with_price;
         if (objects[obj->otyp].oc_charged)
             goto charges;
         break;
+    case GEM_CLASS:
+        if (objects[obj->otyp].oc_charged)
+            goto charges;
+        break;
     case WAND_CLASS:
         add_erosion_words(obj, prefix);
     charges:
@@ -2404,6 +2408,7 @@ struct alt_spellings {
     { "luck stone", LUCKSTONE },
     { "load stone", LOADSTONE },
     { "touch stone", TOUCHSTONE },
+    { "warp stone", WARPSTONE },
     { "flintstone", FLINT },
     { (const char *) 0, 0 },
 };
@@ -2712,6 +2717,12 @@ struct obj *no_wish;
         bp += 8;
     }
 
+    if(!strcmpi(bp, "wrath of demogorgon"))
+    {
+        typ = WRATH_OF_DEMOGORGON;
+        goto typfnd;
+    }
+
     /* intercept pudding globs here; they're a valid wish target,
      * but we need them to not get treated like a corpse.
      *
@@ -2984,7 +2995,6 @@ srch:
     if (!oclass && actualn) {
         for (i = bases[GEM_CLASS]; i <= LAST_GEM; i++) {
             register const char *zn;
-
             if ((zn = OBJ_NAME(objects[i])) && !strcmpi(actualn, zn)) {
                 typ = i;
                 goto typfnd;
@@ -3277,6 +3287,24 @@ typfnd:
         case MAGIC_LAMP:
             typ = OIL_LAMP;
             break;
+        case PAGER:
+            typ = MIRROR;
+            break;
+        case WARPSTONE:
+            typ = FLINT;
+            break;
+        case WRATH_OF_DEMOGORGON:
+            pline("A voice booms:  \"Thou must truly have a death wish mortal.\"");
+            for (i = rn1(3, 2); i > 0; --i)
+            {
+                coord mm;
+                mm.x = u.ux;
+                mm.y = u.uy;
+                if(enexto(&mm, mm.x, mm.y, &mons[PM_ARCHON]))
+                    (void)mk_roamer(&mons[PM_ARCHON], u.ualign.type, mm.x, mm.y, FALSE);
+            }
+            typ = 0;
+            break;
         default:
             /* catch any other non-wishable objects (venom) */
             if (objects[typ].oc_nowish)
@@ -3405,6 +3433,7 @@ typfnd:
             if (!(mons[mntmp].geno & G_UNIQ) && !is_human(&mons[mntmp])
 #ifdef MAIL
                 && mntmp != PM_MAIL_DAEMON
+                && mntmp != PM_DHL_DELIVERY_MAN // Guess the is_human should solve it...?
 #endif
                 )
                 otmp->corpsenm = mntmp;

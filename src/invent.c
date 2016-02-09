@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "sql.h"
 
 #define NOINVSYM '#'
 #define CONTAINED_SYM '>' /* designator for inside a container */
@@ -401,6 +402,7 @@ struct obj *obj;
                && obj->record_achieve_special) {
         u.uachieve.finish_sokoban = 1;
         obj->record_achieve_special = 0;
+        sql_complete_objective("complete", "soko");
     }
 }
 

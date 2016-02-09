@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <limits.h>
 #include "dlb.h"
+#include "sql.h"
 
 /* add b to long a, convert wraparound to max value */
 #define nowrap_add(a, b) (a = ((a + b) < 0 ? LONG_MAX : (a + b)))
@@ -900,6 +901,21 @@ void
 done(how)
 int how;
 {
+    if(ASCENDED == how)
+    {
+        struct obj *obj;
+
+        sql_complete_objective("ascend", NULL);
+
+        for(obj = invent; obj; obj = obj->nobj)
+        {
+            if(WRATH_OF_DEMOGORGON == obj->otyp)
+            {
+                sql_complete_objective("curse", "ascend");
+            }
+        }
+    }
+
     if (how == TRICKED) {
         if (killer.name[0]) {
             paniclog("trickery", killer.name);
@@ -1421,6 +1437,7 @@ terminate(status)
 int status;
 {
     program_state.in_moveloop = 0; /* won't be returning to normal play */
+    sql_set_player_ingame(0);
 #ifdef MAC
     getreturn("to exit");
 #endif

@@ -1845,7 +1845,7 @@ register struct monst *mtmp;
         quest_status.leader_is_dead = TRUE;
 #ifdef MAIL
     /* if the mail daemon dies, no more mail delivery.  -3. */
-    if (tmp == PM_MAIL_DAEMON)
+    if (tmp == PM_MAIL_DAEMON || tmp == PM_DHL_DELIVERY_MAN)
         mvitals[tmp].mvflags |= G_GENOD;
 #endif
 
@@ -1862,12 +1862,26 @@ register struct monst *mtmp;
             break;
         }
     }
-    if (mtmp->iswiz)
+    if (mtmp->iswiz) {
         wizdead();
-    if (mtmp->data->msound == MS_NEMESIS)
+    }
+    if (mtmp->data->msound == MS_NEMESIS) {
+        sql_complete_objective("kill", "nem");
         nemdead();
-    if (mtmp->data == &mons[PM_MEDUSA])
+    }
+    /* Could generalize this, but meh, lets just check each of them for now */
+    if (mtmp->data == &mons[PM_MEDUSA]) {
+        sql_complete_objective("kill", "medusa");
         u.uachieve.killed_medusa = 1;
+    } else if (mtmp->data == &mons[PM_JUIBLEX]) {
+        sql_complete_objective("kill", "juiblex");
+    } else if (mtmp->data == &mons[PM_ORCUS]) {
+        sql_complete_objective("kill", "orcus");
+    } else if (mtmp->data == &mons[PM_VLAD_THE_IMPALER]) {
+        sql_complete_objective("kill", "vlad");
+    } else if (mtmp->data == &mons[PM_DEMOGORGON]) {
+        sql_complete_objective("kill", "demogorgon");
+    }
     if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
         unmap_object(mtmp->mx, mtmp->my);
     m_detach(mtmp, mptr);

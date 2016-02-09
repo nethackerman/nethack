@@ -3,12 +3,8 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "sql.h"
 
-#ifdef MAIL
-#ifdef SIMPLE_MAIL
-# include <fcntl.h>
-# include <errno.h>
-#endif /* SIMPLE_MAIL */
 #include "mail.h"
 
 /*
@@ -35,93 +31,15 @@
  *                       random intervals.
  */
 
-STATIC_DCL boolean FDECL(md_start, (coord *));
-STATIC_DCL boolean FDECL(md_stop, (coord *, coord *));
-STATIC_DCL boolean FDECL(md_rush, (struct monst *, int, int));
 STATIC_DCL void FDECL(newmail, (struct mail_info *));
 
 extern char *viz_rmin, *viz_rmax; /* line-of-sight limits (vision.c) */
-
-#if !defined(UNIX) && !defined(VMS)
-int mustgetmail = -1;
-#endif
-
-#ifdef UNIX
-#include <sys/stat.h>
-#include <pwd.h>
-/* DON'T trust all Unices to declare getpwuid() in <pwd.h> */
-#if !defined(_BULL_SOURCE) && !defined(__sgi) && !defined(_M_UNIX)
-#if !defined(SUNOS4) && !(defined(ULTRIX) && defined(__GNUC__))
-/* DO trust all SVR4 to typedef uid_t in <sys/types.h> (probably to a long) */
-#if defined(POSIX_TYPES) || defined(SVR4) || defined(HPUX)
-extern struct passwd *FDECL(getpwuid, (uid_t));
-#else
-extern struct passwd *FDECL(getpwuid, (int));
-#endif
-#endif
-#endif
-static struct stat omstat, nmstat;
-static char *mailbox = (char *) 0;
-static long laststattime;
-
-#if !defined(MAILPATH) && defined(AMS) /* Just a placeholder for AMS */
-#define MAILPATH "/dev/null"
-#endif
-#if !defined(MAILPATH) && (defined(LINUX) || defined(__osf__))
-#define MAILPATH "/var/spool/mail/"
-#endif
-#if !defined(MAILPATH) && defined(__FreeBSD__)
-#define MAILPATH "/var/mail/"
-#endif
-#if !defined(MAILPATH) && (defined(BSD) || defined(ULTRIX))
-#define MAILPATH "/usr/spool/mail/"
-#endif
-#if !defined(MAILPATH) && (defined(SYSV) || defined(HPUX))
-#define MAILPATH "/usr/mail/"
-#endif
-
-void
-getmailstatus()
-{
-    if (!mailbox && !(mailbox = nh_getenv("MAIL"))) {
-#ifdef MAILPATH
-#ifdef AMS
-        struct passwd ppasswd;
-
-        (void) memcpy(&ppasswd, getpwuid(getuid()), sizeof(struct passwd));
-        if (ppasswd.pw_dir) {
-            mailbox = (char *) alloc((unsigned) strlen(ppasswd.pw_dir)
-                                     + sizeof(AMS_MAILBOX));
-            Strcpy(mailbox, ppasswd.pw_dir);
-            Strcat(mailbox, AMS_MAILBOX);
-        } else
-            return;
-#else
-        const char *pw_name = getpwuid(getuid())->pw_name;
-        mailbox = (char *) alloc(sizeof(MAILPATH) + strlen(pw_name));
-        Strcpy(mailbox, MAILPATH);
-        Strcat(mailbox, pw_name);
-#endif /* AMS */
-#else
-        return;
-#endif
-    }
-    if (stat(mailbox, &omstat)) {
-#ifdef PERMANENT_MAILBOX
-        pline("Cannot get status of MAIL=\"%s\".", mailbox);
-        mailbox = 0;
-#else
-        omstat.st_mtime = 0;
-#endif
-    }
-}
-#endif /* UNIX */
 
 /*
  * Pick coordinates for a starting position for the mail daemon.  Called
  * from newmail() and newphone().
  */
-STATIC_OVL boolean
+boolean
 md_start(startp)
 coord *startp;
 {
@@ -221,7 +139,7 @@ retry:
  * enexto().  Use enexto() as a last resort because enexto() chooses
  * its point randomly, which is not what we want.
  */
-STATIC_OVL boolean
+boolean
 md_stop(stopp, startp)
 coord *stopp;  /* stopping position (we fill it in) */
 coord *startp; /* starting position (read only) */
@@ -262,7 +180,7 @@ static NEARDATA const char *mail_text[] = { "Gangway!", "Look out!",
  * FALSE if the md gets stuck in a position where there is a monster.  Return
  * TRUE otherwise.
  */
-STATIC_OVL boolean
+boolean
 md_rush(md, tx, ty)
 struct monst *md;
 register int tx, ty; /* destination of mail daemon */
@@ -407,306 +325,42 @@ give_up:
         pline("Hark!  \"%s.\"", info->display_txt);
 }
 
-#if !defined(UNIX) && !defined(VMS)
+static unsigned long last_check = 0;
 
 void
 ckmailstatus()
 {
-    if (u.uswallow || !flags.biff)
-        return;
-    if (mustgetmail < 0) {
-#if defined(AMIGA) || defined(MSDOS) || defined(TOS)
-        mustgetmail = (moves < 2000) ? (100 + rn2(2000)) : (2000 + rn2(3000));
-#endif
-        return;
-    }
-    if (--mustgetmail <= 0) {
-        static struct mail_info deliver = {
-            MSG_MAIL, "I have some mail for you", 0, 0
-        };
-        newmail(&deliver);
-        mustgetmail = -1;
-    }
-}
-
-/*ARGSUSED*/
-void
-readmail(otmp)
-struct obj *otmp UNUSED;
-{
-    static char *junk[] = {
-        NULL, /* placeholder for "Report bugs to <devteam@nethack.org>.", */
-        "Please disregard previous letter.", "Welcome to NetHack.",
-#ifdef AMIGA
-        "Only Amiga makes it possible.", "CATS have all the answers.",
-#endif
-        "This mail complies with the Yendorian Anti-Spam Act (YASA)",
-        "Please find enclosed a small token to represent your Owlbear",
-        "**FR33 P0T10N 0F FULL H34L1NG**",
-        "Please return to sender (Asmodeus)",
-      "Buy a potion of gain level for only $19.99! Guaranteed to be blessed!",
-        "Invitation: Visit the NetHack web site at http://www.nethack.org!"
-    };
-
-    /* XXX replace with more general substitution code and add local
-     * contact message.  Also use DEVTEAM_URL */
-    if (junk[0] == NULL) {
-#define BUGS_FORMAT "Report bugs to <%s>."
-        /* +2 from '%s' suffices as substitute for usual +1 for terminator */
-        junk[0] = (char *) alloc(strlen(BUGS_FORMAT) + strlen(DEVTEAM_EMAIL));
-        Sprintf(junk[0], BUGS_FORMAT, DEVTEAM_EMAIL);
-#undef BUGS_FORMAT
-    }
-    if (Blind) {
-        pline("Unfortunately you cannot see what it says.");
-    } else
-        pline("It reads:  \"%s\"", junk[rn2(SIZE(junk))]);
-}
-
-#endif /* !UNIX && !VMS */
-
-#ifdef UNIX
-
-void
-ckmailstatus()
-{
-    ck_server_admin_msg();
-
-    if (!mailbox || u.uswallow || !flags.biff
-#ifdef MAILCKFREQ
-        || moves < laststattime + MAILCKFREQ
-#endif
-        )
-        return;
-
-    laststattime = moves;
-    if (stat(mailbox, &nmstat)) {
-#ifdef PERMANENT_MAILBOX
-        pline("Cannot get status of MAIL=\"%s\" anymore.", mailbox);
-        mailbox = 0;
-#else
-        nmstat.st_mtime = 0;
-#endif
-    } else if (nmstat.st_mtime > omstat.st_mtime) {
-        if (nmstat.st_size) {
+    if(last_check < get_ms())
+    {
+        if(0 == sql_next_mail(NULL, NULL, 0))
+        {
             static struct mail_info deliver = {
-#ifndef NO_MAILREADER
                 MSG_MAIL, "I have some mail for you",
-#else
-                /* suppress creation and delivery of scroll of mail */
-                MSG_OTHER, "You have some mail in the outside world",
-#endif
                 0, 0
             };
             newmail(&deliver);
         }
-        getmailstatus(); /* might be too late ... */
+
+        last_check = get_ms() + 3000;
     }
 }
 
-#if defined(SIMPLE_MAIL) || defined(SERVER_ADMIN_MSG)
-void
-read_simplemail(mbox, adminmsg)
-char *mbox;
-boolean adminmsg;
-{
-    FILE* mb = fopen(mbox, "r");
-    char curline[128], *msg;
-    boolean seen_one_already = FALSE;
-#ifdef SIMPLE_MAIL
-    struct flock fl = { 0 };
-#endif
-    const char *msgfrom = adminmsg
-        ? "The voice of %s booms through the caverns:"
-        : "This message is from '%s'.";
-
-    if (!mb)
-        goto bail;
-
-#ifdef SIMPLE_MAIL
-    fl.l_type = F_RDLCK;
-    fl.l_whence = SEEK_SET;
-    fl.l_start = 0;
-    fl.l_len = 0;
-    errno = 0;
-#endif
-
-    /* Allow this call to block. */
-    if (!adminmsg
-#ifdef SIMPLE_MAIL
-        && fcntl (fileno (mb), F_SETLKW, &fl) == -1
-#endif
-        )
-        goto bail;
-
-    while (fgets(curline, 128, mb) != NULL) {
-        if (!adminmsg) {
-#ifdef SIMPLE_MAIL
-            fl.l_type = F_UNLCK;
-            fcntl (fileno(mb), F_UNLCK, &fl);
-#endif
-            pline("There is a%s message on this scroll.",
-                  seen_one_already ? "nother" : "");
-        }
-        msg = strchr(curline, ':');
-
-        if (!msg)
-            goto bail;
-
-        *msg = '\0';
-        msg++;
-        msg[strlen(msg) - 1] = '\0'; /* kill newline */
-
-        pline(msgfrom, curline);
-        if (adminmsg)
-            verbalize(msg);
-        else
-            pline("It reads: \"%s\".", msg);
-
-        seen_one_already = TRUE;
-#ifdef SIMPLE_MAIL
-        errno = 0;
-        if (!adminmsg) {
-            fl.l_type = F_RDLCK;
-            fcntl(fileno(mb), F_SETLKW, &fl);
-        }
-#endif
-    }
-
-#ifdef SIMPLE_MAIL
-    if (!adminmsg) {
-        fl.l_type = F_UNLCK;
-        fcntl(fileno(mb), F_UNLCK, &fl);
-    }
-#endif
-    fclose(mb);
-    if (adminmsg)
-        display_nhwindow(WIN_MESSAGE, TRUE);
-    else
-        unlink(mailbox);
-    return;
-bail:
-    /* bail out _professionally_ */
-    if (!adminmsg)
-        pline("It appears to be all gibberish.");
-}
-#endif /* SIMPLE_MAIL */
-
-void
-ck_server_admin_msg()
-{
-#ifdef SERVER_ADMIN_MSG
-    static struct stat ost,nst;
-    static long lastchk = 0;
-
-    if (moves < lastchk + SERVER_ADMIN_MSG_CKFREQ) return;
-    lastchk = moves;
-
-    if (!stat(SERVER_ADMIN_MSG, &nst)) {
-        if (nst.st_mtime > ost.st_mtime)
-            read_simplemail(SERVER_ADMIN_MSG, TRUE);
-        ost.st_mtime = nst.st_mtime;
-    }
-#endif /* SERVER_ADMIN_MSG */
-}
-
-/*ARGSUSED*/
 void
 readmail(otmp)
 struct obj *otmp UNUSED;
 {
-#ifdef DEF_MAILREADER /* This implies that UNIX is defined */
-    register const char *mr = 0;
-#endif /* DEF_MAILREADER */
-#ifdef SIMPLE_MAIL
-    read_simplemail(mailbox, FALSE);
-    return;
-#endif /* SIMPLE_MAIL */
-#ifdef DEF_MAILREADER /* This implies that UNIX is defined */
-    display_nhwindow(WIN_MESSAGE, FALSE);
-    if (!(mr = nh_getenv("MAILREADER")))
-        mr = DEF_MAILREADER;
+    int first = 1;
+    char from[SQL_NAME_LENGTH];
+    char message[128];
 
-    if (child(1)) {
-        (void) execl(mr, mr, (char *) 0);
-        terminate(EXIT_FAILURE);
-    }
-#else
-#ifndef AMS /* AMS mailboxes are directories */
-    display_file(mailbox, TRUE);
-#endif /* AMS */
-#endif /* DEF_MAILREADER */
-
-    /* get new stat; not entirely correct: there is a small time
-       window where we do not see new mail */
-    getmailstatus();
-}
-
-#endif /* UNIX */
-
-#ifdef VMS
-
-extern NDECL(struct mail_info *parse_next_broadcast);
-
-volatile int broadcasts = 0;
-
-void
-ckmailstatus()
-{
-    struct mail_info *brdcst;
-
-    if (u.uswallow || !flags.biff)
-        return;
-
-    while (broadcasts > 0) { /* process all trapped broadcasts [until] */
-        broadcasts--;
-        if ((brdcst = parse_next_broadcast()) != 0) {
-            newmail(brdcst);
-            break; /* only handle one real message at a time */
-        }
+    while(0 == sql_next_mail(from, message, 1))
+    {
+        pline(first
+            ? "There is a message on this scroll."
+            : "There is another message on this scroll.");
+        pline("This message is from '%s'.", from);
+        pline("It reads: \"%s\".", message);
+        first = 0;
     }
 }
 
-void
-readmail(otmp)
-struct obj *otmp;
-{
-#ifdef SHELL /* can't access mail reader without spawning subprocess */
-    const char *txt, *cmd;
-    char *p, buf[BUFSZ], qbuf[BUFSZ];
-    int len;
-
-    /* there should be a command in OMAILCMD */
-    if (has_oname(otmp))
-        txt = ONAME(otmp);
-    else
-        txt = "";
-    len = strlen(txt);
-    if (has_omailcmd(otmp))
-        cmd = OMAILCMD(otmp);
-    if (!cmd || !*cmd)
-        cmd = "SPAWN";
-
-    Sprintf(qbuf, "System command (%s)", cmd);
-    getlin(qbuf, buf);
-    if (*buf != '\033') {
-        for (p = eos(buf); p > buf; *p = '\0')
-            if (*--p != ' ')
-                break; /* strip trailing spaces */
-        if (*buf)
-            cmd = buf; /* use user entered command */
-        if (!strcmpi(cmd, "SPAWN") || !strcmp(cmd, "!"))
-            cmd = (char *) 0; /* interactive escape */
-
-        vms_doshell(cmd, TRUE);
-        (void) sleep(1);
-    }
-#else
-    nhUse(otmp);
-#endif /* SHELL */
-}
-
-#endif /* VMS */
-#endif /* MAIL */
-
-/*mail.c*/

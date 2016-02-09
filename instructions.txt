@@ -1,0 +1,5 @@
+1) from this dir:
+       - (cd sys/unix && sh setup.sh hints/unix) && make clean all install
+
+2) to rebuild, use make all update
+

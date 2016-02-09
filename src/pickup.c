@@ -1360,6 +1360,38 @@ boolean telekinesis;
     return result;
 }
 
+void 
+unleash_the_wrath(obj)
+struct obj *obj;
+{
+    long sick_timeout = (Sick & TIMEOUT)
+        ? (Sick & TIMEOUT) / 3L + 1L
+        : (long) rn1(ACURR(A_CON), 20);
+
+    const char *name = obj ? "Wrath of Demogorgon stone" : xname(obj);
+
+    if(obj)
+    {
+        fully_identify_obj(obj);
+    }
+
+    makeknown(WRATH_OF_DEMOGORGON);
+    make_hallucinated((HHallucination & TIMEOUT) + 100L, FALSE, 0L);
+    make_blinded(((Blinded & TIMEOUT) + 100), FALSE);
+    make_stunned((HStun & TIMEOUT) + 30L, FALSE);
+    make_sick(sick_timeout, xname(obj), FALSE, SICK_NONVOMITABLE);
+    set_wounded_legs(BOTH_SIDES, (int)HWounded_legs + 30);
+    u.uhp = 1;
+
+    if(u.uhunger >= 45)
+    {
+        u.uhunger = 44;
+    }
+
+    You("hear a distant laughter echo throughout the dungeon.");
+    more();
+}
+
 /*
  * Pick up <count> of obj from the ground and add it to the hero's inventory.
  * Returns -1 if caller should break out of its loop, 0 if nothing picked
@@ -1426,6 +1458,10 @@ boolean telekinesis; /* not picking it up directly by hand */
     prinv(nearload == SLT_ENCUMBER ? moderateloadmsg : (char *) 0, obj,
           count);
     mrg_to_wielded = FALSE;
+    if(WRATH_OF_DEMOGORGON == obj->otyp)
+    {
+        unleash_the_wrath(obj);
+    }
     return 1;
 }
 
@@ -1964,7 +2000,8 @@ register struct obj *obj;
     } else if (obj->otyp == AMULET_OF_YENDOR
                || obj->otyp == CANDELABRUM_OF_INVOCATION
                || obj->otyp == BELL_OF_OPENING
-               || obj->otyp == SPE_BOOK_OF_THE_DEAD) {
+               || obj->otyp == SPE_BOOK_OF_THE_DEAD
+               || obj->otyp == WRATH_OF_DEMOGORGON) {
         /* Prohibit Amulets in containers; if you allow it, monsters can't
          * steal them.  It also becomes a pain to check to see if someone
          * has the Amulet.  Ditto for the Candelabrum, the Bell and the Book.

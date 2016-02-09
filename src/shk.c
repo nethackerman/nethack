@@ -468,7 +468,15 @@ struct monst *shkp;
              eshkp->credit, currency(eshkp->credit));
         total = 0L; /* credit gets cleared by setpaid() */
     } else {
-        You("escaped the shop without paying!");
+        if(index(in_rooms(u.ux, u.uy, SHOPBASE), eshkp->shoproom)
+            && on_level(&eshkp->shoplevel, &u.uz))
+        {
+            Your("theft did not go unnoticed!");
+        }
+        else
+        {
+            You("escaped the shop without paying!");
+        }
         total -= eshkp->credit;
     }
     setpaid(shkp);

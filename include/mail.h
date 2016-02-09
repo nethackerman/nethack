@@ -18,4 +18,8 @@ struct mail_info {
     const char *response_cmd; /* command to eventually execute */
 };
 
+boolean FDECL(md_rush, (struct monst *, int, int));
+boolean FDECL(md_start, (coord *));
+boolean FDECL(md_stop, (coord *, coord *));
+
 #endif /* MAIL_H */

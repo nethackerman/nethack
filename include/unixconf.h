@@ -36,7 +36,7 @@
 #define NETWORK        /* if running on a networked system */
                        /* e.g. Suns sharing a playground through NFS */
 /* #define SUNOS4 */   /* SunOS 4.x */
-/* #define LINUX */    /* Another Unix clone */
+#define LINUX          /* Another Unix clone */
 /* #define CYGWIN32 */ /* Unix on Win32 -- use with case sensitive defines */
 /* #define GENIX */    /* Yet Another Unix Clone */
 /* #define HISX */     /* Bull Unix for XPS Machines */
@@ -101,7 +101,7 @@
  * If you want the static parts of your playground on a read-only file
  * system, define VAR_PLAYGROUND to be where the variable parts are kept.
  */
-/* #define VAR_PLAYGROUND "/var/lib/games/nethack" */
+#define VAR_PLAYGROUND "/nh360/var"
 
 /*
  * Define DEF_PAGER as your default pager, e.g. "/bin/cat" or "/usr/ucb/more"

@@ -83,6 +83,7 @@ extern int NDECL(dohelp);             /**/
 extern int NDECL(dohistory);          /**/
 extern int NDECL(doloot);             /**/
 extern int NDECL(dodrink);            /**/
+extern int NDECL(docurse);            /**/
 extern int NDECL(dodip);              /**/
 extern int NDECL(dosacrifice);        /**/
 extern int NDECL(dopray);             /**/
@@ -533,29 +534,8 @@ enter_explore_mode(VOID_ARGS)
 {
     if (wizard) {
         You("are in debug mode.");
-    } else if (discover) {
-        You("are already in explore mode.");
     } else {
-#ifdef SYSCF
-#if defined(UNIX)
-        if (!sysopt.explorers || !sysopt.explorers[0]
-            || !check_user_string(sysopt.explorers)) {
-            You("cannot access explore mode.");
-            return 0;
-        }
-#endif
-#endif
-        pline(
-        "Beware!  From explore mode there will be no return to normal game.");
-        if (paranoid_query(ParanoidQuit,
-                           "Do you want to enter explore mode?")) {
-            clear_nhwindow(WIN_MESSAGE);
-            You("are now in non-scoring explore mode.");
-            discover = TRUE;
-        } else {
-            clear_nhwindow(WIN_MESSAGE);
-            pline("Resuming normal game.");
-        }
+        You("can't enter explore mode, it is disabled.");
     }
     return 0;
 }
@@ -2771,6 +2751,7 @@ struct ext_func_tab extcmdlist[] = {
     { "chat", "talk to someone", dotalk, TRUE }, /* converse? */
     { "conduct", "list voluntary challenges you have maintained", doconduct,
       TRUE },
+    { "curse", "curse an enemy team", docurse, TRUE },
     { "dip", "dip an object into something", dodip, FALSE },
     { "enhance", "advance or check weapon and spell skills",
       enhance_weapon_skill, TRUE },

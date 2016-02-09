@@ -6,6 +6,7 @@
 
 #include "hack.h"
 #include "dlb.h"
+#include "sql.h"
 
 #include <ctype.h>
 #include <sys/stat.h>
@@ -41,7 +42,7 @@ extern void NDECL(init_linux_cons);
 #endif
 
 static void NDECL(wd_message);
-static boolean wiz_error_flag = FALSE;
+boolean wiz_error_flag = FALSE;
 static struct passwd *NDECL(get_unix_pw);
 
 int
@@ -49,10 +50,12 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
+    int rc;
     register int fd;
 #ifdef CHDIR
     register char *dir;
 #endif
+    boolean restored = FALSE;
     boolean exact_username;
     boolean resuming = FALSE; /* assume new game */
 
@@ -167,6 +170,7 @@ char *argv[];
     check_linux_console();
 #endif
     initoptions();
+
 #ifdef PANICTRACE
     ARGV0 = argv[0]; /* save for possible stack trace */
 #ifndef NO_SIGNAL
@@ -201,10 +205,6 @@ char *argv[];
         && !(catmore = nh_getenv("PAGER")))
         catmore = DEF_PAGER;
 #endif
-#ifdef MAIL
-    getmailstatus();
-#endif
-
     /* wizard mode access is deferred until here */
     set_playmode(); /* sets plname to "wizard" for wizard mode */
     if (exact_username) {
@@ -291,6 +291,21 @@ attempt_restore:
                 }
             }
         }
+    }
+
+    rc = sql_initialize(plname);
+
+    if(0 != rc)
+    {
+        more();
+
+        if(rc > 0 && resuming)
+        {
+            dosave0();
+        }
+        clearlocks();
+        terminate(EXIT_SUCCESS);
+        return 0;
     }
 
     if (!resuming) {
@@ -569,8 +584,7 @@ port_help()
 boolean
 authorize_wizard_mode()
 {
-    struct passwd *pw = get_unix_pw();
-    if (pw && sysopt.wizards && sysopt.wizards[0]) {
+    if (sysopt.wizards && sysopt.wizards[0]) {
         if (check_user_string(sysopt.wizards))
             return TRUE;
     }
@@ -582,16 +596,9 @@ static void
 wd_message()
 {
     if (wiz_error_flag) {
-        if (sysopt.wizards && sysopt.wizards[0]) {
-            char *tmp = build_english_list(sysopt.wizards);
-            pline("Only user%s %s may access debug (wizard) mode.",
-                  index(sysopt.wizards, ' ') ? "s" : "", tmp);
-            free(tmp);
-        } else
-            pline("Entering explore/discovery mode instead.");
-        wizard = 0, discover = 1; /* (paranoia) */
-    } else if (discover)
-        You("are in non-scoring explore/discovery mode.");
+        wizard = 0;
+    }
+    discover = 0;
 }
 
 /*
@@ -618,18 +625,11 @@ boolean
 check_user_string(optstr)
 char *optstr;
 {
-    struct passwd *pw = get_unix_pw();
     int pwlen;
     char *eop, *w;
-    char *pwname;
+    char *pwname = plname;
     if (optstr[0] == '*')
         return TRUE; /* allow any user */
-    if (!pw)
-        return FALSE;
-    if (sysopt.check_plname)
-        pwname = plname;
-    else
-        pwname = pw->pw_name;
     pwlen = strlen(pwname);
     eop = eos(optstr);
     w = optstr;

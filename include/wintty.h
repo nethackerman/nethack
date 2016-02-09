@@ -232,6 +232,9 @@ E void FDECL(genl_outrip, (winid, int, time_t));
 E char *FDECL(tty_getmsghistory, (BOOLEAN_P));
 E void FDECL(tty_putmsghistory, (const char *, BOOLEAN_P));
 
+E void FDECL(comm_activate, (struct obj *obj));
+E unsigned long FDECL(get_ms, (void));
+
 #ifdef NO_TERMS
 #ifdef MAC
 #ifdef putchar

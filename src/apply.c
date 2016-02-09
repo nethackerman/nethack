@@ -3,8 +3,11 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "sql.h"
 
 extern boolean notonhead; /* for long worms */
+
+void comm_activate(struct obj *obj);
 
 STATIC_DCL int FDECL(use_camera, (struct obj *));
 STATIC_DCL int FDECL(use_towel, (struct obj *));
@@ -2179,6 +2182,105 @@ reset_trapset()
     trapinfo.force_bungle = 0;
 }
 
+STATIC_OVL const struct member *
+select_member(void)
+{
+    int rc;
+    menu_item *pick_list;
+    anything any = zeroany;
+    int i;
+    const struct member *send_to = NULL;
+    const struct clan_info *we = sql_get_my_team();
+
+    winid tmpwin = create_nhwindow(NHW_MENU);
+
+    start_menu(tmpwin);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_INVERSE, "Send to what clan member?", MENU_UNSELECTED);
+    for(i = 0; i < we->num_members; ++i)
+    {
+        if(wizard || we->members[i].player_id != sql_get_player_id())
+        {
+            any.a_int = i + 1;
+            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, we->members[i].name, MENU_UNSELECTED);
+        }
+    }
+    end_menu(tmpwin, "The warpstone glows.");
+
+    if(select_menu(tmpwin, PICK_ONE, &pick_list) > 0)
+    {
+        send_to = &we->members[pick_list[0].item.a_char - 1];
+        free(pick_list);
+    }
+
+    destroy_nhwindow(tmpwin);
+    return send_to;
+}
+
+STATIC_OVL void
+use_warpstone(ws, obj)
+    struct obj *ws;
+    struct obj *obj;
+{
+    const struct member *send_to;
+
+    if(context.made_amulet)
+    {
+        pline("Your %s seems to have quit working.", xname(ws));
+        return;
+    }
+
+    if(!ws->spe)
+    {
+        pline("%s in your hand for a second.", Tobjnam(ws, "vibrate"));
+        return;
+    }
+
+    if(obj->oartifact || Is_container(obj)
+    || PAGER == obj->otyp || WARPSTONE == obj->otyp
+    || objects[obj->otyp].oc_unique)
+    {
+        pline("%s the stone.", Yobjnam2(obj, "avoid"));
+        return;
+    }
+    /* Anti start-scumming. Wizards basically start with a complete ascension kit,
+       and possibly charging. */
+    if(!wizard && obj->startgear)
+    {
+        You("couldn't possibly part with an item that reminds you of the outside world.");
+        return;
+    }
+
+    if(obj->owornmask)
+    {
+        pline("Your body is torn to shreds as %s into another dimension.", yobjnam(obj, "vanish"));
+        You("die...");
+        done(DISSOLVED);
+        return;
+    }
+
+    if(NULL == (send_to = select_member()))
+    {
+        pline("You change your mind at the last second.");
+        return;
+    }
+
+    --ws->spe;
+
+    if(obj->quan > 1)
+    {
+        obj = splitobj(obj, 1L);
+    }
+
+    sql_send_item(send_to->player_id, sql_get_player_id(), obj);
+
+    if(obj->unpaid)
+    {
+        remote_burglary(u.ux, u.uy);
+    }
+    useupall(obj);
+    pline("%s before it vanishes into another dimension.", Tobjnam(obj, "shimmer"));
+}
+
 /* touchstones - by Ken Arnold */
 STATIC_OVL void
 use_stone(tstone)
@@ -2207,6 +2309,11 @@ struct obj *tstone;
 
     if (obj == tstone && obj->quan == 1L) {
         You_cant("rub %s on itself.", the(xname(obj)));
+        return;
+    }
+
+    if (tstone->otyp == WARPSTONE) {
+        use_warpstone(tstone, obj);
         return;
     }
 
@@ -3329,10 +3436,11 @@ char class_list[];
 {
     register struct obj *otmp;
     int otyp;
-    boolean knowoil, knowtouchstone, addpotions, addstones, addfood;
+    boolean knowoil, knowtouchstone, knowwarpstone, addpotions, addstones, addfood;
 
     knowoil = objects[POT_OIL].oc_name_known;
     knowtouchstone = objects[TOUCHSTONE].oc_name_known;
+    knowwarpstone = objects[WARPSTONE].oc_name_known;
     addpotions = addstones = addfood = FALSE;
     for (otmp = invent; otmp; otmp = otmp->nobj) {
         otyp = otmp->otyp;
@@ -3341,10 +3449,10 @@ char class_list[];
                 && (!otmp->dknown
                     || (!knowoil && !objects[otyp].oc_name_known))))
             addpotions = TRUE;
-        if (otyp == TOUCHSTONE
+        if ((otyp == TOUCHSTONE || otyp == WARPSTONE)
             || (is_graystone(otmp)
                 && (!otmp->dknown
-                    || (!knowtouchstone && !objects[otyp].oc_name_known))))
+                    || (!(knowtouchstone && knowwarpstone) && !objects[otyp].oc_name_known))))
             addstones = TRUE;
         if (otyp == CREAM_PIE || otyp == EUCALYPTUS_LEAF)
             addfood = TRUE;
@@ -3416,6 +3524,7 @@ doapply()
     case SACK:
     case BAG_OF_HOLDING:
     case OILSKIN_SACK:
+    case DHL_PACKAGE:
         res = use_container(&obj, 1);
         break;
     case BAG_OF_TRICKS:
@@ -3423,6 +3532,9 @@ doapply()
         break;
     case CAN_OF_GREASE:
         use_grease(obj);
+        break;
+    case PAGER:
+        comm_activate(obj);
         break;
     case LOCK_PICK:
     case CREDIT_CARD:
@@ -3531,6 +3643,7 @@ doapply()
     case BEARTRAP:
         use_trap(obj);
         break;
+    case WARPSTONE:
     case FLINT:
     case LUCKSTONE:
     case LOADSTONE:

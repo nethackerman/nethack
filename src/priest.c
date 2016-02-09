@@ -4,6 +4,7 @@
 
 #include "hack.h"
 #include "mfndpos.h"
+#include "sql.h"
 
 /* these match the categorizations shown by enlightenment */
 #define ALGN_SINNED (-4) /* worse than strayed (-1..-3) */
@@ -33,6 +34,95 @@ struct monst *mtmp;
         EPRI(mtmp) = (struct epri *) 0;
     }
     mtmp->ispriest = 0;
+}
+
+static const struct clan_info *pick_curse_clan(void)
+{
+    int has_targets = 0;
+    unsigned int i;
+    unsigned int found;
+
+    struct clan_state state;
+
+    menu_item *pick_list;
+    anything any = zeroany;
+    winid tmpwin;
+
+    const struct clan_info *curse_clan = NULL;
+    const struct clan_info *clans = sql_get_clans(&found);
+
+    tmpwin = create_nhwindow(NHW_MENU);
+
+    start_menu(tmpwin);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_INVERSE, "What clan do you wish to curse?", MENU_UNSELECTED);
+
+    for(i = 0; i < found; ++i)
+    {
+        if(wizard || (clans[i].clan_id != sql_get_my_team()->clan_id))
+        {
+            if(0 == sql_get_clan_state(sql_get_my_team()->clan_id, &state)
+            && state.can_be_cursed)
+            {
+                any.a_int = i + 1;
+                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, clans[i].name, MENU_UNSELECTED);
+                has_targets = 1;
+            }
+        }
+    }
+
+    end_menu(tmpwin, "The gods anxiously awaits your answer.");
+
+    if(0 == has_targets)
+    {
+        verbalize("There are currently no clans receptacle to curses.");
+        destroy_nhwindow(tmpwin);
+        return curse_clan;
+    }
+
+    if(select_menu(tmpwin, PICK_ONE, &pick_list) > 0)
+    {
+        i = pick_list[0].item.a_char;
+        curse_clan = clans + (i - 1);
+        free(pick_list);
+    }
+
+    destroy_nhwindow(tmpwin);
+    return curse_clan;
+}
+
+int docurse(void)
+{
+    struct clan_state state;
+    const struct clan_info *curse_clan;
+
+    if(0 != sql_get_clan_state(sql_get_my_team()->clan_id, &state))
+    {
+        verbalize("Thou art asking too much of me.");
+        return 0;
+    }
+
+    if(state.gold < SQL_GOLD_TO_CURSE)
+    {
+        verbalize("You team is not strong enough yet.");
+        return 0;
+    }
+
+    if(NULL != (curse_clan = pick_curse_clan()))
+    {
+        if(0 != sql_curse_clan(curse_clan->clan_id))
+        {
+            pline("You currently can't curse.");
+        }
+        else
+        {
+            pline("A voice booms:");
+            verbalize("Very well, %s have been cursed.", curse_clan->name);
+            sql_write_critical("%s have put a horrible curse on %s", sql_get_my_team()->name, curse_clan->name);
+            sql_complete_objective("curse", "clan");
+        }
+    }
+
+    return 0;
 }
 
 /*
@@ -623,7 +713,7 @@ register struct monst *priest;
                     u.ublessed = rn1(3, 2);
             } else
                 u.ublessed++;
-        } else {
+        } else if (offer < (u.ulevel * 800)) {
             verbalize("Thy selfless generosity is deeply appreciated.");
             if (money_cnt(invent) < (offer * 2L) && coaligned) {
                 if (strayed && (moves - u.ucleansed) > 5000L) {
@@ -632,6 +722,15 @@ register struct monst *priest;
                 } else {
                     adjalign(2);
                 }
+            }
+        } else {
+            if(0 == sql_make_donation(offer))
+            {
+                verbalize("Thy team grows stronger.");
+            }
+            else
+            {
+                verbalize("Thy money has been lost.");
             }
         }
     }

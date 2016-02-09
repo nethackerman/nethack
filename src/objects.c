@@ -64,6 +64,19 @@ struct monst { struct monst *dummy; };  /* lint: struct obj's union */
 NEARDATA struct objdescr obj_descr[] =
 #else
 /* second pass -- object definitions */
+/* nmkn: make known */
+/* mrg: merge with other of same type */
+/* uskn: uses known */
+/* ctnr: not used */
+/* mgc: magical */
+/* chrg: has charges */
+/* uniq: unique */
+/* nwsh: cannot wish for it */
+/* big: big object i guess */
+/* tuf: tough (hard gems, rings) */
+/* dir: spell/wand type (ray/beam and so on) */
+/* sub: sub type */
+/* mtrl: material */
 #define BITS(nmkn,mrg,uskn,ctnr,mgc,chrg,uniq,nwsh,big,tuf,dir,sub,mtrl) \
   nmkn,mrg,uskn,0,mgc,chrg,uniq,nwsh,big,tuf,dir,mtrl,sub /*SCO cpp fodder*/
 #define OBJECT(obj,bits,prp,sym,prob,dly,wt,cost,sdam,ldam,oc1,oc2,nut,color) \
@@ -647,6 +660,7 @@ OBJECT(OBJ("Amulet of Yendor", /* note: description == name */
 CONTAINER("large box",       None, 1, 0, 0, 40, 350,   8, WOOD, HI_WOOD),
 CONTAINER("chest",           None, 1, 0, 0, 35, 600,  16, WOOD, HI_WOOD),
 CONTAINER("ice box",         None, 1, 0, 0,  5, 900,  42, PLASTIC, CLR_WHITE),
+CONTAINER("DHL package",     None, 1, 0, 0,  0, 350,   8, WOOD, CLR_GREEN),
 CONTAINER("sack",           "bag", 0, 0, 0, 35,  15,   2, CLOTH, HI_CLOTH),
 CONTAINER("oilskin sack",   "bag", 0, 0, 0,  5,  15, 100, CLOTH, HI_CLOTH),
 CONTAINER("bag of holding", "bag", 0, 1, 0, 20,  15, 100, CLOTH, HI_CLOTH),
@@ -664,6 +678,7 @@ TOOL("brass lantern",       None, 1, 0, 0, 0, 30, 30, 12, COPPER, CLR_YELLOW),
 TOOL("oil lamp",          "lamp", 0, 0, 0, 0, 45, 20, 10, COPPER, CLR_YELLOW),
 TOOL("magic lamp",        "lamp", 0, 0, 1, 0, 15, 20, 50, COPPER, CLR_YELLOW),
 /* other tools */
+TOOL("pager",               None, 1, 0, 0, 0,  0,  4, 1, IRON, HI_METAL),
 TOOL("expensive camera",    None, 1, 0, 0, 1, 15, 12,200, PLASTIC, CLR_BLACK),
 TOOL("mirror",   "looking glass", 0, 0, 0, 0, 45, 13, 10, GLASS, HI_SILVER),
 TOOL("crystal ball", "glass orb", 0, 0, 1, 1, 15,150, 60, GLASS, HI_GLASS),
@@ -1070,6 +1085,11 @@ GEM("fluorite",         "violet", 15, 1,  400, 15,  4, GEMSTONE, CLR_MAGENTA),
 GEM("obsidian",          "black",  9, 1,  200, 15,  6, GEMSTONE, CLR_BLACK),
 GEM("agate",            "orange", 12, 1,  200, 15,  6, GEMSTONE, CLR_ORANGE),
 GEM("jade",              "green", 10, 1,  300, 15,  6, GEMSTONE, CLR_GREEN),
+
+OBJECT(OBJ("Wrath of Demogorgon",  "red"),
+    BITS(0, 0, 0, 0, 1, 0, 0, 0, 0, HARDGEM(6), 0, -P_SLING, GEMSTONE),
+    0, GEM_CLASS, 0 /* prob */, 1, 0, 3, 3, 0, 0, 0, 10, CLR_RED),
+
 GEM("worthless piece of white glass", "white",
     77, 1, 0, 6, 5, GLASS, CLR_WHITE),
 GEM("worthless piece of blue glass", "blue",
@@ -1097,6 +1117,11 @@ GEM("worthless piece of violet glass", "violet",
 ROCK("luckstone", "gray",  0,  10,  10, 60, 3, 3, 1, 10, 7, MINERAL, CLR_GRAY),
 ROCK("loadstone", "gray",  0,  10, 500,  1, 3, 3, 1, 10, 6, MINERAL, CLR_GRAY),
 ROCK("touchstone", "gray", 0,   8,  10, 45, 3, 3, 1, 10, 6, MINERAL, CLR_GRAY),
+
+OBJECT(OBJ("warpstone",  "gray"),
+    BITS(1, 0, 1, 0, 1, 1, 0, 0, 0, HARDGEM(6), 0, -P_SLING, MINERAL),
+    0, GEM_CLASS, 0 /* prob */, 1, 0, 3, 3, 0, 0, 0, 10, CLR_GRAY),
+
 ROCK("flint", "gray",      0,  10,  10,  1, 6, 6, 0, 10, 7, MINERAL, CLR_GRAY),
 ROCK("rock", None,         1, 100,  10,  0, 3, 3, 0, 10, 7, MINERAL, CLR_GRAY),
 #undef GEM

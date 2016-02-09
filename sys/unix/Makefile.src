@@ -329,7 +329,7 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
 	   files.c fountain.c hack.c hacklib.c invent.c light.c lock.c \
 	   mail.c makemon.c mapglyph.c mcastu.c mhitm.c mhitu.c minion.c \
-	   mklev.c mkmap.c \
+	   sql.c dhl.c mklev.c mkmap.c \
 	   mkmaze.c mkobj.c mkroom.c mon.c mondata.c monmove.c monst.c \
 	   mplayer.c mthrowu.c muse.c music.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
@@ -395,7 +395,7 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	drawing.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
 	extralev.o files.o fountain.o hack.o hacklib.o invent.o light.o \
 	lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
-	minion.o mklev.o mkmap.o \
+	sql.o dhl.o minion.o mklev.o mkmap.o \
 	mkmaze.o mkobj.o mkroom.o mon.o mondata.o monmove.o monstr.o \
 	mplayer.o mthrowu.o muse.o music.o o_init.o objnam.o options.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
@@ -727,9 +727,9 @@ wc_trace.o: ../win/chain/wc_trace.c $(HACK_H) ../include/func_tab.h
 	$(CC) $(CFLAGS) -c ../win/chain/wc_trace.c
 monstr.o: monstr.c $(CONFIG_H)
 vis_tab.o: vis_tab.c $(CONFIG_H) ../include/vis_tab.h
-allmain.o: allmain.c $(HACK_H)
+allmain.o: allmain.c $(HACK_H) ../include/dhl.h
 alloc.o: alloc.c $(CONFIG_H)
-apply.o: apply.c $(HACK_H)
+apply.o: apply.c $(HACK_H) ../include/sql.h ../include/dhl.h
 artifact.o: artifact.c $(HACK_H) ../include/artifact.h ../include/artilist.h
 attrib.o: attrib.c $(HACK_H)
 ball.o: ball.c $(HACK_H)
@@ -766,6 +766,8 @@ invent.o: invent.c $(HACK_H)
 light.o: light.c $(HACK_H) ../include/lev.h
 lock.o: lock.c $(HACK_H)
 mail.o: mail.c $(HACK_H) ../include/mail.h
+dhl.o: dhl.c mail.c $(HACK_H) ../include/mail.h ../include/dhl.h
+sql.o: sql.c ../include/sql.h
 makemon.o: makemon.c $(HACK_H)
 mapglyph.o: mapglyph.c $(HACK_H)
 mcastu.o: mcastu.c $(HACK_H)

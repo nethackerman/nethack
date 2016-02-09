@@ -5,6 +5,8 @@
 /* various code that was replicated in *main.c */
 
 #include "hack.h"
+#include "dhl.h"
+#include "sql.h"
 
 #ifndef NO_SIGNAL
 #include <signal.h>
@@ -13,6 +15,44 @@
 #ifdef POSITIONBAR
 STATIC_DCL void NDECL(do_positionbar);
 #endif
+
+void comm_update(void);
+
+extern boolean wiz_error_flag;
+
+static void check_for_curse(void)
+{
+    int turns_left = -1;
+    const char *by;
+
+    if(0 != sql_decrement_curse_turns(&turns_left, &by))
+    {
+        return;
+    }
+
+    if(0 == turns_left)
+    {
+        struct obj *obj = mksobj(WRATH_OF_DEMOGORGON, TRUE, FALSE);
+
+        if(obj)
+        {
+            if(0 != sql_send_item(sql_get_player_id(), SQL_SYSTEM_PLAYER_ID, obj))
+            {
+                // nag
+            }
+            obfree(obj, (struct obj *) 0);
+        }
+        else
+        {
+            // nag
+        }
+    }
+    else if(SQL_CURSE_DELAY == turns_left)
+    {
+        verbalize("Thou hast been cursed by %s!", by);
+        more();
+    }
+}
 
 void
 moveloop(resuming)
@@ -24,7 +64,6 @@ boolean resuming;
 #endif
     int moveamt = 0, wtcap = 0, change = 0;
     boolean monscanmove = FALSE;
-
     /* Note:  these initializers don't do anything except guarantee that
             we're linked properly.
     */
@@ -32,6 +71,8 @@ boolean resuming;
     monst_init();
     monstr_init(); /* monster strengths */
     objects_init();
+
+    sql_set_player_ingame(1); /* This could fail, but its ok-ish */
 
     if (wizard)
         add_debug_extended_commands();
@@ -80,6 +121,24 @@ boolean resuming;
     u.uz0.dlevel = u.uz.dlevel;
     youmonst.movement = NORMAL_SPEED; /* give the hero some movement points */
     context.move = 0;
+
+    if(wiz_error_flag)
+    {
+        int i;
+
+        pline("Bahaha! So you thought you could cheat mortal?");
+        more();
+
+        for(i = 0; i < 5; ++i)
+        {
+            struct monst * const m = makemon(&mons[PM_ARCHON], u.ux, u.uy, NO_MM_FLAGS);
+            if(m)
+            {
+                m->mtame     = 0;
+                m->mpeaceful = 0;
+            }
+        }
+    }
 
     program_state.in_moveloop = 1;
     for (;;) {
@@ -175,6 +234,7 @@ boolean resuming;
                     /********************************/
                     /* once-per-turn things go here */
                     /********************************/
+                    check_for_curse();
 
                     if (Glib)
                         glibr();
@@ -436,6 +496,8 @@ boolean resuming;
 
         u.umoved = FALSE;
 
+        comm_update();
+
         if (multi > 0) {
             lookaround();
             if (!multi) {
@@ -455,9 +517,9 @@ boolean resuming;
                 rhack(save_cm);
             }
         } else if (multi == 0) {
-#ifdef MAIL
+
             ckmailstatus();
-#endif
+            dhl_update();
             rhack((char *) 0);
         }
         if (u.utotype)       /* change dungeon level */

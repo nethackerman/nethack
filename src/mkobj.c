@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "sql.h"
 
 STATIC_DCL void FDECL(mkbox_cnts, (struct obj *));
 STATIC_DCL void FDECL(maybe_adjust_light, (struct obj *, int));
@@ -835,7 +836,9 @@ boolean artif;
                 curse(otmp);
             else if (otmp->otyp == ROCK)
                 otmp->quan = (long) rn1(6, 6);
-            else if (otmp->otyp != LUCKSTONE && !rn2(6))
+            else if ((otmp->otyp != LUCKSTONE
+                   && otmp->otyp != WARPSTONE
+                   && otmp->otyp != WRATH_OF_DEMOGORGON) && !rn2(6))
                 otmp->quan = 2L;
             else
                 otmp->quan = 1L;
@@ -914,8 +917,12 @@ boolean artif;
             }
             break;
         case AMULET_CLASS:
-            if (otmp->otyp == AMULET_OF_YENDOR)
+            if (otmp->otyp == AMULET_OF_YENDOR) {
+                if(FALSE == context.made_amulet) {
+                    sql_complete_objective("get", "aoy");
+                }
                 context.made_amulet = TRUE;
+            }
             if (rn2(10) && (otmp->otyp == AMULET_OF_STRANGULATION
                             || otmp->otyp == AMULET_OF_CHANGE
                             || otmp->otyp == AMULET_OF_RESTFUL_SLEEP)) {

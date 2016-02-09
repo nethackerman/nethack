@@ -189,7 +189,7 @@
 
 #ifndef SYSCF
 #define SYSCF                /* use a global configuration */
-#define SYSCF_FILE "sysconf" /* global configuration is in a file */
+#define SYSCF_FILE "/nh360/sysconf" /* global configuration is in a file */
 #endif
 
 #ifndef GDBPATH
@@ -224,11 +224,11 @@
 #define POINTSMIN 1 /* must be > 0 */
 #endif
 #ifndef ENTRYMAX
-#define ENTRYMAX 100 /* must be >= 10 */
+#define ENTRYMAX 2000 /* must be >= 10 */
 #endif
 #ifndef PERS_IS_UID
 #if !defined(MICRO) && !defined(MAC) && !defined(WIN32)
-#define PERS_IS_UID 1 /* delete for PERSMAX per name; now per uid */
+#define PERS_IS_UID 0 /* delete for PERSMAX per name; now per uid */
 #else
 #define PERS_IS_UID 0
 #endif
@@ -254,7 +254,7 @@
 
 #if defined(UNIX) && !defined(ZLIB_COMP) && !defined(COMPRESS)
 /* path and file name extension for compression program */
-#define COMPRESS "/usr/bin/compress" /* Lempel-Ziv compression */
+#define COMPRESS "/bin/gzip" /* Lempel-Ziv compression */
 #define COMPRESS_EXTENSION ".Z"      /* compress's extension */
 /* An example of one alternative you might want to use: */
 /* #define COMPRESS "/usr/local/bin/gzip" */ /* FSF gzip compression */
@@ -321,7 +321,7 @@
  * otherwise it will be the current directory.
  */
 #ifndef HACKDIR
-#define HACKDIR "/usr/games/lib/nethackdir"
+#define HACKDIR "/nh360"
 #endif
 
 /*

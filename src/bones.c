@@ -155,6 +155,10 @@ boolean restore;
                     if (mnum == PM_DOPPELGANGER && otmp->otyp == CORPSE)
                         set_corpsenm(otmp, mnum);
                 }
+            } else if (otmp->otyp == WARPSTONE) {
+                otmp->otyp = FLINT;
+            } else if (otmp->otyp == PAGER) {
+                otmp->otyp = MIRROR;
             } else if (otmp->otyp == AMULET_OF_YENDOR) {
                 /* no longer the real Amulet */
                 otmp->otyp = FAKE_AMULET_OF_YENDOR;

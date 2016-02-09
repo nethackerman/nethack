@@ -1,0 +1,85 @@
+c-todo:
+test bans
+Score on odd levels
+TWoD: Naming is shot to shit, explicitly name it The i think
+     All naming actually, You athme named magicbane fex. dont use "your"
+utf8 chat
+Named object not in disco (just read a bunch of amnesia) - Warpstone, No fucking idea why?
+no nag in check_for_curse()
+IMPORTANT - curse works? fixs gold
+IMPORTANT - can_be_cursed always true
+nag @ quest completed?
+Quest completion:
+	kill curse
+sql unsigned ints not null
+save on sql init failure works?
+
+c-todo-future:
+sql_consume_delivery() should not use get_team_member() if someone leaves.
+
+web-todo:
+sql save score
+cap number of clans that can be created to 256 (or limit in query?)...
+username regex
+clanname length JS + upload image + use image
+describe scoring for kill
+upload clan image
+
+done:
+drop box @ dhl
+stack pluralization incorrect (prints 8 vanish, when only 1 do)
+honor ingame or not
+set ingame (Somehow...)
+pager gui
+pager num messages
+DGL works! :D
+fix sql escape logic, its retarded as all hell for NULL (update dgl too, copy-paste shit)
+stealing with warpstone is has no penalty (kops + angry (same as tele out))
+poly of key-items!?
+wish pager -> mirror
+wiz-mode-error effects? 5x archons @ t: 1 ;)
+warpstone charges
+wardstone charge'able
+make unique somehow? (not pager, not sure if i care too much)
+duplicate spec i dgl
+start with 1 charge (Warpstone) (99 in wizard mode)
+inte skicka ascension items
+putty chat color bug
+mail demon
+no sending starting gear, possible? might be able to use oc_pre_discovered
+   Nope :) add some bool to obj instead and set it for starting gear...
+   patch obj
+The warth of Demogorgon: Ill Weak 1hp loadstone Blind
+system messages @ pager (change for relation table <.<)
+dhl: always spawn item
+dhl: patches for TWoD
+donations?
+  points @ ascension
+Bones can save our crap
+BONES, ffs <.<
+TWoD should be red gem in bones (unless known)
+In_endgame... or "oY? - no warpstone (make sure In_endgame is what i think it is)
+	context.made_amulet
+Move higest_msg_id to database instead of on item
+default config menucolors (+ niceness for pager and quest items)
+add message in unleash_the_wrath
+fix reach_strt (quest)
+Quest completion:
+	reach (done)
+	ascend (done)
+	kill - mondead+wizdead - (done)
+	ascend curse item (done)
+	get xlevel (done)
+	complete soko (done)
+	clan curse (done)
+Add use for donated money.
+leaking package/item?
+add scoring engine
+implement "game"-field in all tables (for making private tours)
+select clan_id/player_id once? :)
+fix score award for entering level (it always gives score)
+tell cursed team, more();
+create the game database shit <.<
+bug - pager sees stuff from wrong clan?
+bug - crash in comm_name_color()
+bug - crash on announcements

@@ -817,6 +817,13 @@ register int after;
         mongone(mtmp);
         return 2;
     }
+    if (ptr == &mons[PM_DHL_DELIVERY_MAN]) {
+        if(!Deaf) {
+            verbalize("Where are you sir? I can't find you!.");
+        }
+        mongone(mtmp);
+        return 2;
+    }
 #endif
 
     /* teleport if that lies in our nature */

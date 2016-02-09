@@ -126,7 +126,8 @@ register int nk;
 
 #ifdef MAIL
     /* Mail daemons put up no fight. */
-    if (mtmp->data == &mons[PM_MAIL_DAEMON])
+    if (mtmp->data == &mons[PM_MAIL_DAEMON]
+    || mtmp->data ==&mons[PM_DHL_DELIVERY_MAN])
         tmp = 1;
 #endif
 
@@ -284,6 +285,7 @@ boolean incr; /* true iff via incremental experience growth */
 
     /* increase level (unless already maxxed) */
     if (u.ulevel < MAXULEV) {
+        char literal_level[16]; 
         /* increase experience points to reflect new level */
         if (incr) {
             long tmp = newuexp(u.ulevel + 1);
@@ -296,6 +298,8 @@ boolean incr; /* true iff via incremental experience growth */
         if (u.ulevelmax < u.ulevel)
             u.ulevelmax = u.ulevel;
         pline("Welcome to experience level %d.", u.ulevel);
+        sprintf(literal_level, "%d", u.ulevel);
+        sql_complete_objective("level", literal_level);
         adjabil(u.ulevel - 1, u.ulevel); /* give new intrinsics */
         reset_rndmonst(NON_PM);          /* new monster selection */
     }

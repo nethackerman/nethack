@@ -6,6 +6,7 @@
 
 #include "hack.h"
 #include "lev.h"
+#include "sql.h"
 
 STATIC_DCL void FDECL(trycall, (struct obj *));
 STATIC_DCL void NDECL(polymorph_sink);
@@ -1113,6 +1114,7 @@ boolean at_stairs, falling, portal;
             was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz),
             familiar = FALSE,
             new = FALSE; /* made a new level? */
+    s_level *sl;
     struct monst *mtmp;
     char whynot[BUFSZ];
     char *annotation;
@@ -1246,6 +1248,7 @@ boolean at_stairs, falling, portal;
      */
     if ((at_stairs || falling || portal) && (u.uz.dnum != newlevel->dnum))
         recbranch_mapseen(&u.uz, newlevel);
+
     assign_level(&u.uz0, &u.uz);
     assign_level(&u.uz, newlevel);
     assign_level(&u.utolev, newlevel);
@@ -1270,6 +1273,16 @@ boolean at_stairs, falling, portal;
         if (level_info[new_ledger].flags & (FORGOTTEN | VISITED)) {
             impossible("goto_level: returning to discarded level?");
             level_info[new_ledger].flags &= ~(FORGOTTEN | VISITED);
+        }
+        for(sl = sp_levchn; sl; sl = sl->next)
+        {
+            if((newlevel->dnum == sl->dlevel.dnum) && (newlevel->dlevel == sl->dlevel.dlevel))
+            {
+                const char *proto = strchr(sl->proto, '-'); /* Fix quest level (reach_Ran-strt -> reach_strt) */
+                proto = (NULL == proto) ? sl->proto : (proto + 1);
+                pline("Awarding for reaching: %s", sl->proto);
+                sql_complete_objective("reach", sl->proto);
+            }
         }
         mklev();
         new = TRUE; /* made the level */

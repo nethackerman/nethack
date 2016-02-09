@@ -1064,10 +1064,6 @@ E void FDECL(nocmov, (int x, int y));
 /* ### mail.c ### */
 
 #ifdef MAIL
-#ifdef UNIX
-E void NDECL(getmailstatus);
-E void NDECL(ck_server_admin_msg);
-#endif
 E void NDECL(ckmailstatus);
 E void FDECL(readmail, (struct obj *));
 #endif /* MAIL */
@@ -1737,6 +1733,7 @@ E void NDECL(getlock);
 
 /* ### pickup.c ### */
 
+E void FDECL(unleash_the_wrath, (struct obj *obj));
 E int FDECL(collect_obj_classes, (char *, struct obj *, BOOLEAN_P,
                                   boolean FDECL((*), (OBJ_P)), int *));
 E boolean FDECL(rider_corpse_revival, (struct obj *, BOOLEAN_P));
@@ -1855,6 +1852,8 @@ E const char *FDECL(align_gtitle, (ALIGNTYP_P));
 E void FDECL(altar_wrath, (int, int));
 
 /* ### priest.c ### */
+
+E int FDECL(docurse, (void));
 
 E int FDECL(move_special, (struct monst *, BOOLEAN_P, SCHAR_P, BOOLEAN_P,
                            BOOLEAN_P, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));

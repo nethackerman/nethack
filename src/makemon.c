@@ -1534,7 +1534,7 @@ int mndx, mvflagsmask, genomask;
         return FALSE;
 #ifdef MAIL
     /* special levels might ask for random demon type; reject this one */
-    if (ptr == &mons[PM_MAIL_DAEMON])
+    if (ptr == &mons[PM_MAIL_DAEMON] || ptr == &mons[PM_DHL_DELIVERY_MAN])
         return FALSE;
 #endif
     return TRUE;

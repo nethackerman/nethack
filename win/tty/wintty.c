@@ -13,6 +13,7 @@
 #define H2344_BROKEN
 
 #include "hack.h"
+#include "sql.h"
 
 #ifdef TTY_GRAPHICS
 #include "dlb.h"
@@ -23,6 +24,8 @@
 extern void msmsg(const char *, ...);
 #endif
 #endif
+
+#include <sys/time.h>
 
 #ifndef NO_TERMS
 #include "tcap.h"
@@ -1365,11 +1368,12 @@ int type;
         break;
     case NHW_MENU:
     case NHW_TEXT:
+    case NHW_COMM:
         /* inventory/menu window, variable length, full width, top of screen
          */
         /* help window, the same, different semantics for display, etc */
         newwin->offx = newwin->offy = 0;
-        newwin->rows = 0;
+        newwin->rows = (type == NHW_COMM) ? 24 : 0;
         newwin->cols = ttyDisplay->cols;
         newwin->maxrow = newwin->maxcol = 0;
         break;
@@ -1515,6 +1519,7 @@ winid window;
         context.botlx = 1;
     /* fall into ... */
     case NHW_BASE:
+    case NHW_COMM:
         clear_screen();
         break;
     case NHW_MENU:
@@ -2149,6 +2154,7 @@ boolean blocking; /* with ttys, all windows are blocking */
             tty_display_nhwindow(WIN_MESSAGE, TRUE);
             return;
         }
+    case NHW_COMM:
     case NHW_BASE:
         (void) fflush(stdout);
         break;
@@ -2233,6 +2239,7 @@ winid window;
         break;
     case NHW_MENU:
     case NHW_TEXT:
+    case NHW_COMM:
         if (cw->active) {
             if (iflags.window_inited) {
                 /* otherwise dismissing the text endwin after other windows
@@ -2313,6 +2320,9 @@ register int x, y; /* not xchar: perhaps xchar is unsigned and
             break;
         case NHW_BASE:
             s = "[base window]";
+            break;
+        case NHW_COMM:
+            s = "[comm window]";
             break;
         }
         debugpline4("bad curs positioning win %d %s (%d,%d)", window, s, x,
@@ -2504,6 +2514,28 @@ const char *str;
         cw->cury++;
         term_end_attr(attr);
         break;
+    case NHW_COMM:
+        tty_curs(window, cw->curx + 1, cw->cury);
+        term_start_attr(attr);
+        term_start_attr(attr);
+        while (*str) {
+            if ((int) ttyDisplay->curx >= 79 || '\n' == *str) {
+                cw->curx = 0;
+                cw->cury++;
+                tty_curs(window, cw->curx + 1, cw->cury);
+                if('\n' == *str) {
+                    ++str;
+                    continue;
+                }
+            }
+            (void) putchar(*str);
+            str++;
+            cw->curx++;
+            ttyDisplay->curx++;
+        }
+        term_end_attr(attr);
+        break;
+
     case NHW_BASE:
         tty_curs(window, cw->curx + 1, cw->cury);
         term_start_attr(attr);
@@ -3717,6 +3749,602 @@ anything threshold;
 
 #endif /* STATUS_HILITES */
 #endif /*STATUS_VIA_WINDOWPORT*/
+
+struct comm_graphics
+{
+    const char *str;
+    int attr;
+    int color;
+};
+
+#define COLOR_INPUT CLR_WHITE
+
+#define COMM_BORDER ATR_BOLD, CLR_WHITE
+#define COMM_BODY   ATR_INVERSE, CLR_GRAY
+#define COMM_TITLE  COMM_BODY
+#define COMM_INNER  0, CLR_BLACK
+#define COMM_BUTTON COMM_BODY
+#define COMM_POWER  ATR_INVERSE, CLR_RED
+#define COMM_LABEL  COMM_BODY
+#define COMM_INPUT  ATR_BOLD, COLOR_INPUT
+
+#define COMM_CHAT_LINE \
+    { "|", COMM_BORDER }, \
+    { " ", COMM_BODY }, \
+    { "|", COMM_BORDER }, \
+    { "                                                                         ", COMM_INNER }, \
+    { "|", COMM_BORDER }, \
+    { " ", COMM_BODY }, \
+    { "|\n", COMM_BORDER }
+    
+
+static const struct comm_graphics device[] =
+{
+    { " _____________________________________________________________________________\n", COMM_BORDER },
+    
+    { "/", COMM_BORDER },
+    { "                                                                             ", COMM_BODY },
+    { "\\\n", COMM_BORDER },
+
+    { "|", COMM_BORDER },
+    { " ", COMM_BODY },
+    { "!Dungeons of Doom - Cross-Dimensional Pager", COMM_TITLE },
+    { "                                  ", COMM_BODY },
+    { "|\n", COMM_BORDER },
+
+    { "|", COMM_BORDER },
+    { "  ", COMM_BODY },
+    { "                                                                         ", COMM_BODY },
+    { "  ", COMM_BODY },
+    { "|\n", COMM_BORDER },
+
+    { "|", COMM_BORDER },
+    { " ", COMM_BODY },
+    { "/", COMM_BORDER },
+    { " ", COMM_INNER },
+    { "Clan members:", COMM_INNER }, 
+    { "                                                           ", COMM_INNER },
+    { "\\", COMM_BORDER },
+    { " ", COMM_BODY },
+    { "|\n", COMM_BORDER },
+
+    COMM_CHAT_LINE,
+    COMM_CHAT_LINE,
+    COMM_CHAT_LINE,
+    COMM_CHAT_LINE,
+    COMM_CHAT_LINE,
+    COMM_CHAT_LINE,
+    COMM_CHAT_LINE,
+    COMM_CHAT_LINE,
+    COMM_CHAT_LINE,
+    COMM_CHAT_LINE,
+    COMM_CHAT_LINE,
+    COMM_CHAT_LINE,
+    COMM_CHAT_LINE,
+    COMM_CHAT_LINE,
+    COMM_CHAT_LINE,
+
+    { "|", COMM_BORDER },
+    { " ", COMM_BODY },
+    { "\\", COMM_BORDER },
+    { "_________________________________________________________________________", COMM_BORDER },
+    { "/", COMM_BORDER },
+    { " ", COMM_BODY },
+    { "|\n", COMM_BORDER },
+
+    { "|", COMM_BORDER },
+    { " ", COMM_BODY },
+    { "[", COMM_BUTTON },
+    { " ", COMM_POWER },
+    { "]", COMM_BUTTON },
+    { " ", COMM_BODY },
+    { "!Power", COMM_LABEL },
+    { "                               ", COMM_BODY }, 
+    { "[", COMM_BUTTON },
+    { "$", COMM_POWER },
+    { "]", COMM_BUTTON },
+    { " ", COMM_BODY },
+    { "!Cross-dimensional reception", COMM_LABEL },
+    { " ", COMM_BODY },
+    { "|\n", COMM_BORDER },
+
+    { "|", COMM_BORDER },
+    { "  ", COMM_BODY },
+    { "                                                                         ", COMM_BODY },
+    { "  ", COMM_BODY },
+    { "|\n", COMM_BORDER },
+
+    { "\\", COMM_BORDER },
+    { " ", COMM_BODY },
+    { "!Input", COMM_LABEL },
+    { " ", COMM_BODY },
+    { "[", COMM_BUTTON },
+    { "                                                              ", COMM_INPUT },
+    { "]", COMM_BUTTON },
+    { "      ", COMM_BODY },
+    { "/\n", COMM_BORDER },
+};
+
+#define MAX_MESSAGE_LEN 61
+#define INPUT_X 10
+#define INPUT_Y 23
+#define MEMBERS_X 19
+#define MEMBERS_Y 4
+
+#define CHAT_NEWEST_X 4
+#define CHAT_NEWEST_Y 19
+
+#define NO_SIGNAL_X 15
+#define NO_SIGNAL_Y 12
+
+static struct chat_history chat_history = { 0 };
+
+static int comm_name_color(const char *name)
+{
+    unsigned int sum = 17;
+    while(*name)
+    {
+        sum *= *name;
+        ++name;
+    }
+    return (sum & 0x100) ? CLR_RED + (sum % 7) : CLR_ORANGE + (sum % 7);
+}
+
+static char rusted[80];
+
+static char *rust_device(const char *p, int eroded)
+{
+    char *d = rusted;
+
+    if(!eroded)
+    {
+        return (char *)p;
+    }
+
+    while(*p)
+    {
+        char r = *p++;
+
+        if(0 == rn2(8 - (eroded * 2)))
+        {
+            switch(r)
+            {
+                case '|':
+                    switch(rn2(4))
+                    {
+                        case 0: r = '{'; break;
+                        case 1: r = '}'; break;
+                        case 2: r = '\\'; break;
+                        case 3: r = '/'; break;
+                    }
+                    break;
+                case '_':
+                    switch(rn2(3))
+                    {
+                        case 0: r = '-'; break;
+                        case 1: r = '.'; break;
+                        case 2: r = ','; break;
+                    }
+                    break;
+                case '/':
+                case '\\':
+                    r = rn2(2) ? '<' : '>';
+                    break;
+                case '[':
+                case ']':
+                    r = '|';
+                    break;
+            }
+        }
+
+        *d++ = r;
+    }
+
+    *d = 0;
+
+    return rusted;
+}
+
+unsigned long get_ms(void)
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
+}
+
+static int kbhit(void)
+{
+    int rc;
+    struct timeval tv;
+    fd_set rdfs;
+
+    tv.tv_sec = 0;
+    tv.tv_usec = 80 * 1000;
+
+    FD_ZERO(&rdfs);
+    FD_SET(STDIN_FILENO, &rdfs);
+
+    rc = select(STDIN_FILENO + 1, &rdfs, NULL, NULL, &tv);
+    return (1 == rc) && FD_ISSET(STDIN_FILENO, &rdfs);
+ }
+
+static int update_members(winid comm)
+{
+    int i;
+    struct player_state state;
+    const struct clan_info *we = sql_get_my_team();
+
+    tty_curs(comm, MEMBERS_X, MEMBERS_Y);
+
+    for(i = 0; i < we->num_members; ++i)
+    {
+        int is_ingame = 0;
+        const struct member * const m = &we->members[i];
+
+        if(0 == sql_get_player_state(m->player_id, &state))
+        {
+            is_ingame = state.is_ingame;
+        }
+
+        term_start_color(is_ingame ? CLR_GREEN : CLR_RED);
+        tty_putstr(comm, ATR_BOLD, m->name);
+        term_end_color();
+        tty_putstr(comm, 0, " ");
+    }
+
+    return 0;
+}
+
+static int update_chat(winid comm, int force_invalidation)
+{
+    int i;
+    unsigned int msg_count = 0;
+
+    if(0 != sql_get_unread(NULL, &msg_count, 1))
+    {
+        return 1;
+    }
+
+    if(0 == force_invalidation && 0 == msg_count)
+    {
+        return 0;
+    }
+
+    if(0 != sql_get_messages(&chat_history, 0, 15))
+    {
+        return 1; // This is bad, but whatever, shouldnt happen ;)
+    }
+
+    for(i = 0; i < chat_history.num_messages; ++i)
+    {
+        int nuke;
+        struct chat_message * const msg = &chat_history.history[i];
+        msg->msg[MAX_MESSAGE_LEN] = 0;
+        msg->name[10] = 0;
+
+        tty_curs(comm, CHAT_NEWEST_X, CHAT_NEWEST_Y - i);
+
+        if(CHAT_TYPE_CLAN == msg->type)
+        {
+            term_start_color(comm_name_color(msg->name));
+            tty_putstr(comm, 0, msg->name);
+            term_end_color();
+
+            tty_putstr(comm, 0, ": ");
+
+            term_start_color(CLR_WHITE);
+            tty_putstr(comm, 0, msg->msg);
+        }
+        else
+        {
+            term_start_color(CHAT_TYPE_CRITICAL == msg->type ? CLR_RED : CLR_GREEN);
+            tty_putstr(comm, 0, "*** ");
+            tty_putstr(comm, 0, msg->msg);
+            tty_putstr(comm, 0, " ***");
+        }
+
+        for(nuke = strlen(msg->msg); nuke < MAX_MESSAGE_LEN; ++nuke)
+        {
+            tty_putstr(comm, 0, " ");
+        }
+
+        term_end_color();
+    }
+
+    fflush(stdout);
+    return 0;
+}
+
+static char message[128];
+
+static const char *run_device(winid comm, struct obj *pager)
+{
+    int mlen = 0;
+    int force_invalidation = 1;
+    unsigned long next_member_update = 0;
+    unsigned long next_chat_update   = 0;
+    int c;
+
+    for(;;)
+    {
+        if(next_member_update < get_ms())
+        {
+            if(0 != update_members(comm))
+            {
+                return "There seems to be a disturbance...";
+            }
+
+            next_member_update = get_ms() + (5 * 1000); // 5 sec
+        }
+
+        if(next_chat_update < get_ms())
+        {
+            if(0 != update_chat(comm, force_invalidation))
+            {
+                return "Lost connection with the satellite...";
+            }
+
+            force_invalidation  = 0;
+            next_chat_update    = get_ms() + 200; // 200 ms
+        }
+
+        pager->usecount = 0; // unread
+        oname(pager, "no unread messages");
+
+        tty_curs(comm, INPUT_X + mlen, INPUT_Y);
+        fflush(stdout);
+
+        if(kbhit())
+        {
+            if('\n' == (c = tty_nhgetch()))
+            {
+                if(0 == mlen)
+                {
+                    continue;
+                }
+
+                message[mlen] = 0;
+                sql_write_message("%s", message);
+                mlen = 0;
+            }
+            else if('\b' == c || '\177' == c)
+            {
+                if(mlen)
+                {
+                    --mlen;
+                }
+            }
+            else if('\033' == c || EOF == c)
+            {
+                break;
+            }
+            else
+            {
+                if(mlen < MAX_MESSAGE_LEN)
+                {
+                    message[mlen++] = (((unsigned int)c) >= 0x80 || c < ' ') ? '?' : c;
+                }
+            }
+
+            memset(message + mlen, ' ', MAX_MESSAGE_LEN - mlen);
+
+            tty_curs(comm, INPUT_X, INPUT_Y);
+            term_start_color(COLOR_INPUT);
+            tty_putstr(comm, 0, message);
+            term_end_color();
+        }
+    }
+
+    return NULL;
+}
+
+static long next_pager_update = 0;
+
+void comm_update(void)
+{
+    char unread[128];
+    unsigned int curr_unread;
+    unsigned int count = 0;
+    unsigned int most_critical = 0;
+    struct obj *pager;
+
+    if(next_pager_update >= get_ms())
+    {
+        return;
+    }
+
+    next_pager_update = get_ms() + 500;
+
+    for(pager = invent; pager; pager = pager->nobj)
+    {
+        if(PAGER == pager->otyp)
+        {
+            break;
+        }
+    }
+
+    //
+    // No pager in main inventory
+    //
+    if(NULL == pager)
+    {
+        return;
+    }
+
+    if(0 != sql_get_unread(&most_critical, &count, 0))
+    {
+        return;
+    }
+
+    curr_unread = (pager->usecount < 0) ? 0 : pager->usecount;
+
+    /* pline("id: %d (%d), unread: %d, curr: %d", last_id, high_id, num_unread, curr_unread); */
+
+    if(count > curr_unread)
+    {
+        const char *format;
+
+        if(0 == curr_unread)
+        {
+            if(!Deaf)
+            {
+                You("hear your pager beeping, *beep* *beep*.");
+            }
+            else
+            {
+                You("notice your pager is vibrating, *brrrr*.");
+            }
+        }
+
+        pager->usecount = count;
+
+        switch(most_critical)
+        {
+            case CHAT_TYPE_ANNOUNCE:
+                format = "%d unread messages.";
+                break;
+            case CHAT_TYPE_CRITICAL:
+                format = "%d unread messages!";
+                break;
+            default:
+                format = "%d unread messages";
+                break;
+        }
+
+        sprintf(unread, format, count);
+        oname(pager, unread);
+    }
+}
+
+void comm_activate(obj)
+    struct obj *obj;
+{
+    int i;
+    winid comm;
+    const char *exit_error = NULL;
+
+    memset(message, 0, sizeof(message));
+
+    if(ttyDisplay->rows < 24 || ttyDisplay->cols < 80)
+    {
+        pline("The device is too large to render (80x24 is min).");
+        return;
+    }
+
+    comm = create_nhwindow(NHW_COMM);
+    tty_clear_nhwindow(comm);
+
+    for(i = 0; i < (sizeof(device) / sizeof(device[0])); ++i)
+    {
+        const struct comm_graphics * const g = &device[i];
+        
+        if('$' == *g->str)
+        {
+            int color = CLR_YELLOW;
+            const char *pre = "  ";
+            const char *post = "   ";
+
+            if(obj->blessed)
+            {
+                pre = " ";
+                post = "    ";
+                color = CLR_GREEN;
+            }
+            else if(obj->cursed)
+            {
+                pre = "    ";
+                post = " ";
+                color = CLR_RED;
+            }
+
+            tty_putstr(comm, 0, pre);
+            term_start_color(color);
+            tty_putstr(comm, ATR_INVERSE, post);
+            term_end_color();
+        }
+        else
+        {
+            char *final;
+          
+            if('!' == *g->str)
+            {
+                char *p = message;
+                int orglen;
+
+                strcpy(message, g->str + 1);
+                final = message;
+                orglen = strlen(message);
+
+                if(obj->oeroded)
+                {
+                    int newlen;
+                    wipeout_text(message, strlen(message) / (7 - (obj->oeroded * 2)), 0);
+
+                    newlen = strlen(message);
+
+                    if(newlen < orglen)
+                    {
+                        memset(message + newlen, ' ', orglen - newlen);
+                        message[orglen] = 0;
+                    }
+                }
+
+                while(*p)
+                {
+                    if('?' == *p)
+                    {
+                        *p = ' ';
+                    }
+                    ++p;
+                }                
+            }
+            else
+            {
+                final = rust_device(g->str, obj->oeroded);
+            }
+
+            if(NO_COLOR != g->color)
+            {
+                if(obj->oeroded && CLR_WHITE == g->color)
+                {
+                    term_start_color(CLR_RED);
+                }
+                else
+                {
+                    term_start_color(g->color);
+                }
+            }
+
+            tty_putstr(comm, g->attr, final);
+            term_end_color();
+        }
+    }
+
+    display_nhwindow(comm, TRUE);
+
+    if(obj->cursed)
+    {
+        tty_curs(comm, NO_SIGNAL_X, NO_SIGNAL_Y);
+        term_start_color(CLR_RED);
+        tty_putstr(comm, ATR_BOLD, "*** Your cross-dimensional reception is too bad ***");
+        term_end_color();
+        tty_curs(comm, INPUT_X, INPUT_Y);
+
+        tty_nhgetch();
+    }
+    else
+    {
+        exit_error = run_device(comm, obj);
+    }
+
+cleanup:
+    destroy_nhwindow(comm);
+    if(exit_error)
+    {
+        pline("%s", exit_error);
+    }
+    return;
+}
 
 #endif /* TTY_GRAPHICS */
 

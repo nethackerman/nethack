@@ -116,6 +116,7 @@ struct obj {
     unsigned oeaten;        /* nutrition left in food, if partly eaten */
     long age;               /* creation date */
     long owornmask;
+    char startgear;         /* set for your start gear */
     struct oextra *oextra; /* pointer to oextra struct */
 };
 
@@ -325,7 +326,8 @@ struct obj {
 /* special stones */
 #define is_graystone(obj)                                 \
     ((obj)->otyp == LUCKSTONE || (obj)->otyp == LOADSTONE \
-     || (obj)->otyp == FLINT || (obj)->otyp == TOUCHSTONE)
+     || (obj)->otyp == FLINT || (obj)->otyp == TOUCHSTONE \
+     || (obj)->otyp == WARPSTONE)
 
 /* misc */
 #define is_flimsy(otmp)                           \

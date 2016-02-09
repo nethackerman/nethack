@@ -421,7 +421,7 @@ struct obj *obj;
                                   && objects[obj->otyp].oc_name_known)));
     if (is_weptool(obj)) /* specific check before general tools */
         return FALSE;
-    if (obj->oclass == TOOL_CLASS)
+    if (obj->oclass == TOOL_CLASS || obj->oclass == GEM_CLASS)
         return (boolean) objects[obj->otyp].oc_charged;
     return FALSE; /* why are weapons/armor considered charged anyway? */
 }
@@ -532,7 +532,7 @@ int curse_bless;
                 alter_cost(obj, 0L);
         }
 
-    } else if (obj->oclass == TOOL_CLASS) {
+    } else if (obj->oclass == TOOL_CLASS || obj->otyp == WARPSTONE) {
         int rechrg = (int) obj->recharged;
 
         if (objects[obj->otyp].oc_charged) {
@@ -541,11 +541,12 @@ int curse_bless;
                 obj->recharged++;
         }
         switch (obj->otyp) {
+        case WARPSTONE:
         case BELL_OF_OPENING:
             if (is_cursed)
                 stripspe(obj);
             else if (is_blessed)
-                obj->spe += rnd(3);
+                obj->spe += rnd((WARPSTONE == obj->otyp) ? 2 : 3);
             else
                 obj->spe += 1;
             if (obj->spe > 5)

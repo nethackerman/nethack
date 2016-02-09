@@ -106,6 +106,8 @@ struct context_info {
     int current_fruit; /* fruit->fid corresponding to pl_fruit[] */
     int warnlevel;
     int rndencode;          /* randomized escape sequence introducer */
+    unsigned int clan_id;
+    unsigned int game_id;
     long next_attrib_check; /* next attribute check */
     long stethoscope_move;
     short stethoscope_movement;
@@ -121,6 +123,7 @@ struct context_info {
     boolean botl;        /* partially redo status line */
     boolean botlx;       /* print an entirely new bottom line */
     boolean door_opened; /* set to true if door was opened during test_move */
+    boolean wizard_killed; /* killed the wizard? */
     struct dig_info digging;
     struct victual_info victual;
     struct tin_info tin;
