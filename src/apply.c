@@ -2271,7 +2271,10 @@ use_warpstone(ws, obj)
         obj = splitobj(obj, 1L);
     }
 
-    sql_send_item(send_to->player_id, sql_get_player_id(), obj);
+    if(0 == sql_send_item(send_to->player_id, sql_get_player_id(), obj))
+    {
+        sql_complete_objective("team", "send");
+    }
 
     if(obj->unpaid)
     {

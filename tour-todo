@@ -1,12 +1,10 @@
 c-todo:
-test bans
-Score on odd levels
+survive for N turns! -> award
 TWoD: Naming is shot to shit, explicitly name it The i think
      All naming actually, You athme named magicbane fex. dont use "your"
 utf8 chat
 Named object not in disco (just read a bunch of amnesia) - Warpstone, No fucking idea why?
 no nag in check_for_curse()
-IMPORTANT - curse works? fixs gold
 IMPORTANT - can_be_cursed always true
 nag @ quest completed?
 Quest completion:
@@ -26,6 +24,9 @@ describe scoring for kill
 upload clan image
 
 done:
+IMPORTANT - curse works? fixs gold
+Score on odd levels
+test bans
 drop box @ dhl
 stack pluralization incorrect (prints 8 vanish, when only 1 do)
 honor ingame or not

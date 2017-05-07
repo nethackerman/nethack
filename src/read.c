@@ -546,7 +546,7 @@ int curse_bless;
             if (is_cursed)
                 stripspe(obj);
             else if (is_blessed)
-                obj->spe += rnd((WARPSTONE == obj->otyp) ? 2 : 3);
+                obj->spe += rnd((WARPSTONE == obj->otyp) ? (1 + rnd(2)) : 3);
             else
                 obj->spe += 1;
             if (obj->spe > 5)

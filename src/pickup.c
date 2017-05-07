@@ -1380,7 +1380,8 @@ struct obj *obj;
     make_blinded(((Blinded & TIMEOUT) + 100), FALSE);
     make_stunned((HStun & TIMEOUT) + 30L, FALSE);
     make_sick(sick_timeout, xname(obj), FALSE, SICK_NONVOMITABLE);
-    set_wounded_legs(BOTH_SIDES, (int)HWounded_legs + 30);
+    set_wounded_legs(BOTH_SIDES, (int)HWounded_legs + 50);
+    paralyze_monst(&youmonst, rnd(20));
     u.uhp = 1;
 
     if(u.uhunger >= 45)

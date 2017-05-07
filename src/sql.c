@@ -327,7 +327,7 @@ static int load_game(void)
 
 			if(0 == game_id)
 			{
-				pline("Your clan register for a game before playing.");
+				pline("Your clan must register for a game before playing.");
 				goto cleanup;
 			}
 		}
@@ -593,7 +593,7 @@ int sql_get_messages(struct chat_history *history, unsigned int offset, unsigned
 	if(NULL == (res = sql_query("select id, player_id, message, msg_type, unix_timestamp(messages.added) as added"
 		                        " from messages"
 		                        "   where clan_id=%d or msg_type<>0"
-		                        "   order by added desc limit %d, %d",
+		                        "   order by id desc limit %d, %d",
 		                        context.clan_id, offset, count)))
 	{
 		return 1;
@@ -777,7 +777,7 @@ const struct clan_info *sql_get_clans(int *count)
 	return clans;	
 }
 
-static int deduct_gold(void)
+static int purchase_item(unsigned int amount, const char *item)
 {
 	int rc = 1;
 	MYSQL_RES *res;
@@ -785,7 +785,7 @@ static int deduct_gold(void)
 
 	sql_query("lock tables clans write");
 
-	if(NULL == (res = sql_query("select gold from clan_state where clan_id=%d", context.clan_id)))
+	if(NULL == (res = sql_query("select gold, %s_remain from clan_state where clan_id=%d", item, context.clan_id)))
 	{
 		goto unlock_tables;
 	}
@@ -793,10 +793,12 @@ static int deduct_gold(void)
 	if(NULL != (row = mysql_fetch_row(res)))
 	{
 		unsigned int current_gold = (unsigned int)atoi(row[0]);
+		unsigned int items_left = (unsigned int)atoi(row[1]);
 
-		if(current_gold >= SQL_GOLD_TO_CURSE)
+		if(0 != items_left && current_gold >= amount)
 		{
-			sql_query("update clan_state set gold=%d where clan_id=%d", current_gold - SQL_GOLD_TO_CURSE, context.clan_id);
+			sql_query("update clan_state set gold=%d, %s_remain=%d where clan_id=%d", 
+				(current_gold - amount), item, (items_left - 1), context.clan_id);
 			rc = 0;
 		}
 	}
@@ -805,6 +807,11 @@ static int deduct_gold(void)
 unlock_tables:
 	sql_query("unlock tables");
 	return rc;
+}
+
+int sql_wish_clan(void)
+{
+	return purchase_item(SQL_GOLD_TO_WISH, "wish");
 }
 
 int sql_curse_clan(unsigned int to_clan_id)
@@ -817,7 +824,7 @@ int sql_curse_clan(unsigned int to_clan_id)
 		return 1;
 	}
 
-	if(0 != deduct_gold())
+	if(0 != purchase_item(SQL_GOLD_TO_CURSE, "curse"))
 	{
 		return 2;
 	}
@@ -917,11 +924,8 @@ static unsigned int insert_score(unsigned int objective_id, unsigned int score, 
 	MYSQL_RES *res;
 	MYSQL_ROW row;
 	unsigned int value = 0;
-
-	if(0 == decrease_rate)
-	{
-		decrease_rate = 1;
-	}
+	unsigned int times_completed = 0;
+	unsigned int divider;
 
 	res = sql_query("select count(*) from score"
 					" where objective_id=%d and player_id=%d and clan_id=%d",
@@ -934,18 +938,21 @@ static unsigned int insert_score(unsigned int objective_id, unsigned int score, 
 	
 	if(NULL != (row = mysql_fetch_row(res)))
 	{
-		unsigned int times_completed = (unsigned int)atoi(row[0]);
+		times_completed = (unsigned int)atoi(row[0]);
+		divider = (0 == decrease_rate)
+			? 1
+			: (decrease_rate * times_completed);
 		
 		value = (0 == times_completed)
 			? score
-			: (score / (decrease_rate * times_completed));
+			: (score / divider);
 
 		sql_query("insert into score values(0, %d, %d, %d, %d, NOW())",
 			objective_id, player_id, we->clan_id, value);
 	}
 
 	mysql_free_result(res);
-	return value;
+	return (0 == times_completed) ? value : 0;
 }
 
 int sql_complete_objective(const char *category, const char *objective)
@@ -956,7 +963,20 @@ int sql_complete_objective(const char *category, const char *objective)
 	char full[256];
 	char *esc_full;
 
-	sprintf(full, "%s_%s", category, objective);
+	if(!category)
+	{
+		return 3;
+	}
+
+	if(objective)
+	{
+		sprintf(full, "%s_%s", category, objective);
+	}
+	else
+	{
+		strncpy(full, category, sizeof(full));
+		full[sizeof(full) - 1] = 0;
+	}
 
 	if(NULL == (esc_full = make_string(full)))
 	{

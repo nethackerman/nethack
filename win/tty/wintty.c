@@ -3802,8 +3802,8 @@ static const struct comm_graphics device[] =
     { " ", COMM_BODY },
     { "/", COMM_BORDER },
     { " ", COMM_INNER },
-    { "Clan members:", COMM_INNER }, 
-    { "                                                           ", COMM_INNER },
+    { "Team:", COMM_INNER }, 
+    { "                                                                   ", COMM_INNER },
     { "\\", COMM_BORDER },
     { " ", COMM_BODY },
     { "|\n", COMM_BORDER },
@@ -3868,7 +3868,7 @@ static const struct comm_graphics device[] =
 #define MAX_MESSAGE_LEN 61
 #define INPUT_X 10
 #define INPUT_Y 23
-#define MEMBERS_X 19
+#define MEMBERS_X 11
 #define MEMBERS_Y 4
 
 #define CHAT_NEWEST_X 4
@@ -4040,7 +4040,6 @@ static int update_chat(winid comm, int force_invalidation)
             term_start_color(CHAT_TYPE_CRITICAL == msg->type ? CLR_RED : CLR_GREEN);
             tty_putstr(comm, 0, "*** ");
             tty_putstr(comm, 0, msg->msg);
-            tty_putstr(comm, 0, " ***");
         }
 
         for(nuke = strlen(msg->msg); nuke < MAX_MESSAGE_LEN; ++nuke)
@@ -4305,7 +4304,7 @@ void comm_activate(obj)
 
             if(NO_COLOR != g->color)
             {
-                if(obj->oeroded && CLR_WHITE == g->color)
+                if(obj->oeroded && (CLR_WHITE == g->color || CLR_GRAY == g->color))
                 {
                     term_start_color(CLR_RED);
                 }

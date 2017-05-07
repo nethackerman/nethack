@@ -327,6 +327,8 @@ give_up:
 
 static unsigned long last_check = 0;
 
+unsigned long get_ms(void);
+
 void
 ckmailstatus()
 {

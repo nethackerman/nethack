@@ -20,7 +20,7 @@ STATIC_DCL boolean FDECL(restricted_spell_discipline, (int));
 #define UNDEF_TYP 0
 #define UNDEF_SPE '\177'
 #define UNDEF_BLESS 2
-#define WARP_CHARGES 1
+#define WARP_CHARGES 3
 
 /*
  *      Initial inventory for the various roles.

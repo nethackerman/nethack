@@ -1280,9 +1280,18 @@ boolean at_stairs, falling, portal;
             {
                 const char *proto = strchr(sl->proto, '-'); /* Fix quest level (reach_Ran-strt -> reach_strt) */
                 proto = (NULL == proto) ? sl->proto : (proto + 1);
-                pline("Awarding for reaching: %s", sl->proto);
                 sql_complete_objective("reach", sl->proto);
             }
+        }
+
+        if(0 == newlevel->dnum || 1 == newlevel->dnum)
+        {
+            //
+            // Main dungeon or gehennom
+            //
+            char buf[32];
+            sprintf(buf, "%d", depth(&u.uz));
+            sql_complete_objective("reach", buf);
         }
         mklev();
         new = TRUE; /* made the level */

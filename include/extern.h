@@ -1854,6 +1854,7 @@ E void FDECL(altar_wrath, (int, int));
 /* ### priest.c ### */
 
 E int FDECL(docurse, (void));
+E int FDECL(doteamwish, (void));
 
 E int FDECL(move_special, (struct monst *, BOOLEAN_P, SCHAR_P, BOOLEAN_P,
                            BOOLEAN_P, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));

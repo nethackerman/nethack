@@ -90,10 +90,9 @@ static const struct clan_info *pick_curse_clan(void)
     return curse_clan;
 }
 
-int docurse(void)
+static unsigned int get_team_gold(void)
 {
     struct clan_state state;
-    const struct clan_info *curse_clan;
 
     if(0 != sql_get_clan_state(sql_get_my_team()->clan_id, &state))
     {
@@ -101,8 +100,56 @@ int docurse(void)
         return 0;
     }
 
-    if(state.gold < SQL_GOLD_TO_CURSE)
+    return state.gold;
+}
+
+int doteamwish(void)
+{
+    if(get_team_gold() < SQL_GOLD_TO_WISH)
     {
+        pline("A voice booms:");
+        verbalize("You team is not strong enough yet.");
+        return 0;
+    }
+
+    if(0 != sql_wish_clan())
+    {
+        pline("The gods are not listening.");
+    }
+    else
+    {
+        int i;
+        struct obj *obj = mksobj(MAGIC_LAMP, TRUE, FALSE);
+
+        makeknown(MAGIC_LAMP);
+        bless(obj);
+        oname(obj, "a gift from the gods");
+
+        pline("A voice booms:");
+        verbalize("You and your team have all be granted a wish.");
+        more();
+
+        for(i = 0; i < sql_get_my_team()->num_members; ++i)
+        {
+            unsigned int id = sql_get_my_team()->members[i].player_id;
+            if(0 != sql_send_item(id, SQL_SYSTEM_PLAYER_ID, obj))
+            {
+                // TODO : Do something?
+            }
+        }
+
+        dealloc_obj(obj);
+        sql_write_critical("%s have asked the gods for a favor.", sql_get_my_team()->name);
+    }
+}
+
+int docurse(void)
+{
+    const struct clan_info *curse_clan;
+
+    if(get_team_gold() < SQL_GOLD_TO_CURSE)
+    {
+        pline("A voice booms:");
         verbalize("You team is not strong enough yet.");
         return 0;
     }
@@ -615,6 +662,19 @@ struct monst *priest;
         epri_p->hostile_time = 0L;
 }
 
+static void grow_team_strength(long offer)
+{
+    if(0 == sql_make_donation(offer))
+    {
+        pline("Your team grows stronger.");
+        sql_write_critical("Team %s has donated %d gold!", sql_get_my_team()->name, offer);
+    }
+    else
+    {
+        pline("Your money has been lost.");
+    }
+}
+
 void
 priest_talk(priest)
 register struct monst *priest;
@@ -690,6 +750,12 @@ register struct monst *priest;
                 /* give player some token */
                 exercise(A_WIS, TRUE);
             }
+
+            //
+            // TODO XXX : Hack for LAN! Remove this.
+            //
+            grow_team_strength(offer);
+
         } else if (offer < (u.ulevel * 400)) {
             verbalize("Thou art indeed a pious individual.");
             if (money_cnt(invent) < (offer * 2L)) {
@@ -724,14 +790,7 @@ register struct monst *priest;
                 }
             }
         } else {
-            if(0 == sql_make_donation(offer))
-            {
-                verbalize("Thy team grows stronger.");
-            }
-            else
-            {
-                verbalize("Thy money has been lost.");
-            }
+            grow_team_strength(offer);
         }
     }
 }

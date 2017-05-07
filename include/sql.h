@@ -2,7 +2,7 @@
 #define SQL_H
 
 #define SQL_NAME_LENGTH 64
-#define SQL_MAX_MEMBERS	5
+#define SQL_MAX_MEMBERS	8
 #define SQL_MAX_HISTORY 24
 #define SQL_MAX_CLANS	256
 
@@ -12,8 +12,9 @@
 #define CHAT_TYPE_ANNOUNCE	1
 #define CHAT_TYPE_CRITICAL	2
 
-#define SQL_CURSE_DELAY		20
-#define SQL_GOLD_TO_CURSE	1000
+#define SQL_CURSE_DELAY		10
+#define SQL_GOLD_TO_CURSE	800 * 2
+#define SQL_GOLD_TO_WISH	(SQL_GOLD_TO_CURSE * 2)
 
 struct member
 {
@@ -73,6 +74,7 @@ int sql_set_player_ingame(int ingame);
 int sql_next_mail(char *from, char *message, int consume);
 int sql_make_donation(unsigned int gold);
 int sql_curse_clan(unsigned int to_clan_id);
+int sql_wish_clan(void);
 int sql_get_clan_state(unsigned int clan_id, struct clan_state *state);
 int sql_get_player_state(unsigned int player_id, struct player_state *state);
 int sql_decrement_curse_turns(int *turns_left, const char **by);

@@ -8,6 +8,7 @@
 #endif
 
 #include "hack.h"
+#include "sql.h"
 #include "mfndpos.h"
 #include <ctype.h>
 
@@ -1739,12 +1740,19 @@ struct monst *mtmp;
     mtmp->mhp = 0;
 }
 
+struct kill_reward
+{
+    int pm;
+    const char *reward;
+};
+
 void
 mondead(mtmp)
 register struct monst *mtmp;
 {
     struct permonst *mptr;
     int tmp;
+    int numdead;
 
     lifesaved_monster(mtmp);
     if (mtmp->mhp > 0)
@@ -1837,6 +1845,7 @@ register struct monst *mtmp;
      * for rings of conflict and such.
      */
     tmp = monsndx(mtmp->data);
+    numdead = mvitals[tmp].died;
     if (mvitals[tmp].died < 255)
         mvitals[tmp].died++;
 
@@ -1869,19 +1878,83 @@ register struct monst *mtmp;
         sql_complete_objective("kill", "nem");
         nemdead();
     }
-    /* Could generalize this, but meh, lets just check each of them for now */
+
     if (mtmp->data == &mons[PM_MEDUSA]) {
-        sql_complete_objective("kill", "medusa");
         u.uachieve.killed_medusa = 1;
-    } else if (mtmp->data == &mons[PM_JUIBLEX]) {
-        sql_complete_objective("kill", "juiblex");
-    } else if (mtmp->data == &mons[PM_ORCUS]) {
-        sql_complete_objective("kill", "orcus");
-    } else if (mtmp->data == &mons[PM_VLAD_THE_IMPALER]) {
-        sql_complete_objective("kill", "vlad");
-    } else if (mtmp->data == &mons[PM_DEMOGORGON]) {
-        sql_complete_objective("kill", "demogorgon");
     }
+
+    if(0 == numdead)
+    {
+        static const struct kill_reward reward[] =
+        {
+            //
+            // Uniques
+            //
+            { PM_MEDUSA,            "medusa"        },
+            { PM_JUIBLEX,           "juiblex"       },
+            { PM_ORCUS,             "orcus"         },
+            { PM_VLAD_THE_IMPALER,  "vlad"          },
+            { PM_DEMOGORGON,        "demogorgon"    },
+            //
+            // Normals
+            //
+            { PM_WOODCHUCK,         "woodchuck"     },
+            { PM_GRID_BUG,          "gridbug"       },
+            { PM_FLOATING_EYE,      "floatingeye"   },
+            { PM_LITTLE_DOG,        "littledog"     },
+            { PM_GNOME_LORD,        "gnomelord"     },
+            { PM_SMALL_MIMIC,       "smallmimic"    },
+            { PM_LARGE_MIMIC,       "largemimic"    },
+            { PM_GIANT_MIMIC,       "giantmimic"    },
+            { PM_SOLDIER_ANT,       "soldierant"    },
+            { PM_MUMAK,             "mumak"         },
+            { PM_COCKATRICE,        "cockatrice"    },
+            { PM_WARHORSE,          "warhorse"      },
+            { PM_BLACK_DRAGON,      "blackdragon"   },
+            { PM_MASTER_MIND_FLAYER, "mastermindflayer" },
+            { PM_ARCH_LICH,         "archlich"      },
+            { PM_ARCHON,            "archon"        }
+        };
+
+        if(is_unicorn(mtmp->data))
+        {
+            int total    = mvitals[PM_WHITE_UNICORN].died;
+            total       += mvitals[PM_GRAY_UNICORN].died;
+            total       += mvitals[PM_BLACK_UNICORN].died;
+            //
+            // ...by now, at least 1 is dead
+            //
+            if(1 == total)
+            {
+                sql_complete_objective("kill", "unicorn");
+            }
+        }
+        else if(&mons[PM_WERERAT] == mtmp->data
+            || &mons[PM_HUMAN_WERERAT] == mtmp->data)
+        {
+            int total  = mvitals[PM_WERERAT].died;
+            total     += mvitals[PM_HUMAN_WERERAT].died;
+
+            if(1 == total)
+            {
+                sql_complete_objective("kill", "wererat");
+            }
+        }
+        else
+        {
+            int i;
+
+            for(i = 0; i < (sizeof(reward) / sizeof(reward[0])); ++i)
+            {
+                const struct kill_reward * const kr = &reward[i];
+                if(mtmp->data == &mons[kr->pm])
+                {
+                    sql_complete_objective("kill", kr->reward);
+                }
+            }
+        }
+    }
+
     if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
         unmap_object(mtmp->mx, mtmp->my);
     m_detach(mtmp, mptr);

@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "sql.h"
 #include <limits.h>
 
 STATIC_DCL long FDECL(newuexp, (int));
