@@ -1,4 +1,5 @@
-/* NetHack 3.6	tiletext.c	$NHDT-Date: 1454464783 2016/02/03 01:59:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.6	tiletext.c	$NHDT-Date: 1524689272 2018/04/25 20:47:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
+/*      Copyright (c) 2016 by Pasi Kallinen                       */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"
@@ -36,6 +37,20 @@ static void FDECL(write_txttile, (FILE *, pixel (*)[TILE_X]));
 #define FORMAT_STRING                                                       \
     "%[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.] = " \
     "(%d, %d, %d) "
+
+static int grayscale = 0;
+/* grayscale color mapping */
+static const int graymappings[] = {
+ /* .  A  B   C   D   E   F   G   H   I   J   K   L   M   N   O   P */
+    0, 1, 17, 18, 19, 20, 27, 22, 23, 24, 25, 26, 21, 15, 13, 14, 14
+};
+
+void
+set_grayscale(g)
+int g;
+{
+    grayscale = g;
+}
 
 static void
 read_text_colormap(txtfile)
@@ -135,6 +150,13 @@ pixel (*pixels)[TILE_X];
                 return FALSE;
             }
             k = color_index[(int) c[0]];
+            if (grayscale) {
+                if (k > (SIZE(graymappings) - 1))
+                    Fprintf(stderr, "Gray mapping issue %d > %d.\n", k,
+                            SIZE(graymappings) - 1);
+                else
+                    k = graymappings[k];
+            }
             if (k == -1)
                 Fprintf(stderr, "color %c not in colormap!\n", c[0]);
             else {
@@ -160,7 +182,7 @@ pixel (*pixels)[TILE_X];
     /* DICE again... it doesn't seem to eat whitespace after the } like
      * it should, so we have to do so manually.
      */
-    while ((*c = fgetc(txtfile)) != EOF && isspace(*c))
+    while ((*c = fgetc(txtfile)) != EOF && isspace((uchar) *c))
         ;
     ungetc(*c, txtfile);
 #endif

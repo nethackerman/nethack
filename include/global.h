@@ -1,5 +1,6 @@
-/* NetHack 3.6	global.h	$NHDT-Date: 1450306170 2015/12/16 22:49:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	global.h	$NHDT-Date: 1524690661 2018/04/25 21:11:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef GLOBAL_H
@@ -7,7 +8,7 @@
 
 #include <stdio.h>
 
-#define BETA  /* development or beta testing [MRS] */
+/* #define BETA  */ /* development or beta testing [MRS] */
 
 #define DEBUG 
 
@@ -18,6 +19,7 @@
 #define RECORD "record"         /* file containing list of topscorers */
 #define HELP "help"             /* file containing command descriptions */
 #define SHELP "hh"              /* abbreviated form of the same */
+#define KEYHELP "keyhelp"       /* explanatory text for 'whatdoes' command */
 #define DEBUGHELP "wizhelp"     /* file containing debug mode cmds */
 #define RUMORFILE "rumors"      /* file with fortune cookies */
 #define ORACLEFILE "oracles"    /* file with oracular information */

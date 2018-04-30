@@ -1,5 +1,6 @@
 /* NetHack 3.6	vault.c	$NHDT-Date: 1452132199 2016/01/07 02:03:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -191,6 +192,13 @@ findgd()
     return (struct monst *) 0;
 }
 
+void
+vault_summon_gd()
+{
+    if (vault_occupied(u.urooms) && !findgd())
+        u.uinvault = (VAULT_GUARD_TIME - 1);
+}
+
 char
 vault_occupied(array)
 char *array;
@@ -221,8 +229,9 @@ invault()
     vaultroom -= ROOMOFFSET;
 
     guard = findgd();
-    if (++u.uinvault % 30 == 0 && !guard) { /* if time ok and no guard now. */
-        char buf[BUFSZ];
+    if (++u.uinvault % VAULT_GUARD_TIME == 0 && !guard) {
+        /* if time ok and no guard now. */
+        char buf[BUFSZ] = DUMMY;
         register int x, y, dd, gx, gy;
         int lx = 0, ly = 0;
         long umoney;
@@ -377,8 +386,8 @@ invault()
         }
         trycount = 5;
         do {
-            getlin(Deaf ? "You are required to supply your name. -" :
-                    "\"Hello stranger, who are you?\" -", buf);
+            getlin(Deaf ? "You are required to supply your name. -"
+                        : "\"Hello stranger, who are you?\" -", buf);
             (void) mungspaces(buf);
         } while (!buf[0] && --trycount > 0);
 
@@ -392,21 +401,23 @@ invault()
             || !strcmpi(buf, "Creosote")) {
             if (!mvitals[PM_CROESUS].died) {
                 if (Deaf) {
-                    if (!Blind) pline("%s waves goodbye.", noit_Monnam(guard));
+                    if (!Blind)
+                        pline("%s waves goodbye.", noit_Monnam(guard));
                 } else {
                     verbalize(
-                    "Oh, yes, of course.  Sorry to have disturbed you.");
+                         "Oh, yes, of course.  Sorry to have disturbed you.");
                 }
                 mongone(guard);
             } else {
-                setmangry(guard);
+                setmangry(guard, FALSE);
                 if (Deaf) {
                    if (!Blind)
                         pline("%s mouths something and looks very angry!",
-                            noit_Monnam(guard));
-		} else {
-                   verbalize("Back from the dead, are you?  I'll remedy that!");
-		}
+                              noit_Monnam(guard));
+                } else {
+                   verbalize(
+                           "Back from the dead, are you?  I'll remedy that!");
+                }
                 /* don't want guard to waste next turn wielding a weapon */
                 if (!MON_WEP(guard)) {
                     guard->weapon_check = NEED_HTH_WEAPON;
@@ -424,7 +435,7 @@ invault()
         if (!umoney && !hidden_gold()) {
             if (Deaf)
                 pline("%s stomps%s.", noit_Monnam(guard),
-                        (Blind) ? "" : " and beckons");
+                      (Blind) ? "" : " and beckons");
             else
                 verbalize("Please follow me.");
         } else {
@@ -432,20 +443,21 @@ invault()
                 if (Deaf) {
                     if (!Blind)
                         pline("%s glares at you%s.", noit_Monnam(guard),
-                            invent ? "r stuff" : "");
+                              invent ? "r stuff" : "");
                 } else {
                    verbalize("You have hidden gold.");
-		}
+                }
             }
             if (Deaf) {
                 if (!Blind)
-                    pline("%s holds out %s palm and beckons with %s other hand.",
-                        noit_Monnam(guard), mhis(guard), mhis(guard));
-	    } else {
+                    pline(
+                       "%s holds out %s palm and beckons with %s other hand.",
+                          noit_Monnam(guard), mhis(guard), mhis(guard));
+            } else {
                 verbalize(
                     "Most likely all your gold was stolen from this vault.");
                 verbalize("Please drop that gold and follow me.");
-	    }
+            }
         }
         EGD(guard)->gdx = gx;
         EGD(guard)->gdy = gy;
@@ -695,16 +707,16 @@ register struct monst *grd;
                               noit_Monnam(grd), mhis(grd));
                 } else {
                     verbalize("Drop all your gold, scoundrel!");
-		}
+                }
                 return 0;
             } else {
                 if (Deaf) {
                     if (!Blind)
                         pline("%s rubs %s hands with enraged delight!",
-                                noit_Monnam(grd), mhis(grd));
+                              noit_Monnam(grd), mhis(grd));
                 } else {
                     verbalize("So be it, rogue!");
-		}
+                }
                 grd->mpeaceful = 0;
                 return -1;
             }
@@ -811,7 +823,7 @@ nextpos:
     else
         ny += dy;
 
-    while ((typ = (crm = &levl[nx][ny])->typ) != 0) {
+    while ((typ = (crm = &levl[nx][ny])->typ) != STONE) {
         /* in view of the above we must have IS_WALL(typ) or typ == POOL */
         /* must be a wall here */
         if (isok(nx + nx - x, ny + ny - y) && !IS_POOL(typ)

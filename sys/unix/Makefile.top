@@ -1,5 +1,7 @@
-#	NetHack Makefile.
-# NetHack 3.6  Makefile.top	$NHDT-Date: 1449621572 2015/12/09 00:39:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $
+#      NetHack Top-level Makefile.
+# NetHack 3.6  Makefile.top    $NHDT-Date: 1524689449 2018/04/25 20:50:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.36 $
+# Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
+# NetHack may be freely redistributed.  See license for details.
 
 # Root of source tree:
 NHSROOT=.
@@ -76,7 +78,7 @@ VARDAT = $(VARDATD) $(VARDATND)
 # end of configuration
 #
 
-DATHELP = help hh cmdhelp history opthelp wizhelp
+DATHELP = help hh cmdhelp keyhelp history opthelp wizhelp
 
 SPEC_LEVS = asmodeus.lev baalz.lev bigrm-*.lev castle.lev fakewiz?.lev \
 	juiblex.lev knox.lev medusa-?.lev minend-?.lev minefill.lev \
@@ -186,7 +188,7 @@ check-dlb: options
 
 dlb:
 	( cd util ; $(MAKE) dlb )
-	( cd dat ; ../util/dlb cf nhdat $(DATDLB) )
+	( cd dat ; LC_ALL=C ; ../util/dlb cf nhdat $(DATDLB) )
 
 # recover can be used when INSURANCE is defined in include/config.h
 # and the checkpoint option is true

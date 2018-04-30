@@ -1,5 +1,6 @@
 /* NetHack 3.6	topten.c	$NHDT-Date: 1450451497 2015/12/18 15:11:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -30,7 +31,10 @@ static long final_fpos;
 
 #define newttentry() (struct toptenentry *) alloc(sizeof (struct toptenentry))
 #define dealloc_ttentry(ttent) free((genericptr_t) (ttent))
+#ifndef NAMSZ
+/* Changing NAMSZ can break your existing record/logfile */
 #define NAMSZ 10
+#endif
 #define DTHSZ 100
 #define ROLESZ 3
 

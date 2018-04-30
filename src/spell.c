@@ -1,4 +1,4 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1450584420 2015/12/20 04:07:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.75 $ */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1508479722 2017/10/20 06:08:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.84 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -43,6 +43,7 @@ STATIC_DCL int NDECL(throwspell);
 STATIC_DCL void NDECL(cast_protection);
 STATIC_DCL void FDECL(spell_backfire, (int));
 STATIC_DCL const char *FDECL(spelltypemnemonic, (int));
+STATIC_DCL boolean FDECL(spell_aim_step, (genericptr_t, int, int));
 
 /* The roles[] table lists the role-specific values for tuning
  * percent_success().
@@ -643,6 +644,9 @@ rejectcasting()
     if (Stunned) {
         You("are too impaired to cast a spell.");
         return TRUE;
+    } else if (!can_chant(&youmonst)) {
+        You("are unable to chant the incantation.");
+        return TRUE;
     } else if (!freehand()) {
         /* Note: !freehand() occurs when weapon and shield (or two-handed
          * weapon) are welded to hands, so "arms" probably doesn't need
@@ -812,11 +816,11 @@ cast_protection()
                                          ? "maw"
                                          : "ooze")
                                 : (u.uinwater
-                                   ? "water"
+                                   ? hliquid("water")
                                    : (rmtyp == CLOUD)
                                       ? "cloud"
                                       : IS_TREE(rmtyp)
-                                         ? "vegitation"
+                                         ? "vegetation"
                                          : IS_STWALL(rmtyp)
                                             ? "stone"
                                             : "air");
@@ -866,8 +870,8 @@ int spell;
         break;
     case 7:
     case 8:
-        make_stunned(old_conf + 2L * duration / 3L, FALSE); /* 20% */
-        make_confused(old_stun + duration / 3L, FALSE);
+        make_stunned(old_stun + 2L * duration / 3L, FALSE); /* 20% */
+        make_confused(old_conf + duration / 3L, FALSE);
         break;
     case 9:
         make_stunned(old_stun + duration, FALSE); /* 10% */
@@ -882,7 +886,7 @@ int spell;
 boolean atme;
 {
     int energy, damage, chance, n, intell;
-    int skill, role_skill;
+    int skill, role_skill, res = 0;
     boolean confused = (Confusion != 0);
     boolean physical_damage = FALSE;
     struct obj *pseudo;
@@ -932,13 +936,29 @@ boolean atme;
         return 1;
     }
 
-    if (u.uhave.amulet) {
+    /* if the cast attempt is already going to fail due to insufficient
+       energy (ie, u.uen < energy), the Amulet's drain effect won't kick
+       in and no turn will be consumed; however, when it does kick in,
+       the attempt may fail due to lack of energy after the draining, in
+       which case a turn will be used up in addition to the energy loss */
+    if (u.uhave.amulet && u.uen >= energy) {
         You_feel("the amulet draining your energy away.");
-        energy += rnd(2 * energy);
+        /* this used to be 'energy += rnd(2 * energy)' (without 'res'),
+           so if amulet-induced cost was more than u.uen, nothing
+           (except the "don't have enough energy" message) happened
+           and player could just try again (and again and again...);
+           now we drain some energy immediately, which has a
+           side-effect of not increasing the hunger aspect of casting */
+        u.uen -= rnd(2 * energy);
+        if (u.uen < 0)
+            u.uen = 0;
+        context.botl = 1;
+        res = 1; /* time is going to elapse even if spell doesn't get cast */
     }
+
     if (energy > u.uen) {
         You("don't have enough energy to cast that spell.");
-        return 0;
+        return res;
     } else {
         if (spellid(spell) != SPE_DETECT_FOOD) {
             int hungr = energy * 2;
@@ -1136,6 +1156,7 @@ boolean atme;
     case SPE_INVISIBILITY:
         (void) peffects(pseudo);
         break;
+    /* end of potion-like spells */
 
     case SPE_CURE_BLINDNESS:
         healup(0, 0, FALSE, TRUE);
@@ -1151,10 +1172,12 @@ boolean atme;
         (void) make_familiar((struct obj *) 0, u.ux, u.uy, FALSE);
         break;
     case SPE_CLAIRVOYANCE:
-        if (!BClairvoyant)
-            do_vicinity_map();
+        if (!BClairvoyant) {
+            if (role_skill >= P_SKILLED)
+                pseudo->blessed = 1; /* detect monsters as well as map */
+            do_vicinity_map(pseudo);
         /* at present, only one thing blocks clairvoyance */
-        else if (uarmh && uarmh->otyp == CORNUTHAUM)
+        } else if (uarmh && uarmh->otyp == CORNUTHAUM)
             You("sense a pointy hat on top of your %s.", body_part(HEAD));
         break;
     case SPE_PROTECTION:
@@ -1177,11 +1200,25 @@ boolean atme;
     return 1;
 }
 
+/*ARGSUSED*/
+STATIC_OVL boolean
+spell_aim_step(arg, x, y)
+genericptr_t arg UNUSED;
+int x, y;
+{
+    if (!isok(x,y))
+        return FALSE;
+    if (!ZAP_POS(levl[x][y].typ)
+        && !(IS_DOOR(levl[x][y].typ) && (levl[x][y].doormask & D_ISOPEN)))
+        return FALSE;
+    return TRUE;
+}
+
 /* Choose location where spell takes effect. */
 STATIC_OVL int
 throwspell()
 {
-    coord cc;
+    coord cc, uc;
     struct monst *mtmp;
 
     if (u.uinwater) {
@@ -1213,6 +1250,11 @@ throwspell()
         Your("mind fails to lock onto that location!");
         return 0;
     }
+
+    uc.x = u.ux;
+    uc.y = u.uy;
+
+    walk_path(&uc, &cc, spell_aim_step, (genericptr_t) 0);
 
     u.dx = cc.x;
     u.dy = cc.y;
@@ -1301,26 +1343,31 @@ losespells()
  *      are learned, they get inserted into sorted order rather than be
  *      appended to the end of the list?
  */
-static const char *spl_sortchoices[] = {
+enum spl_sort_types {
+    SORTBY_LETTER = 0,
+    SORTBY_ALPHA,
+    SORTBY_LVL_LO,
+    SORTBY_LVL_HI,
+    SORTBY_SKL_AL,
+    SORTBY_SKL_LO,
+    SORTBY_SKL_HI,
+    SORTBY_CURRENT,
+    SORTRETAINORDER,
+
+    NUM_SPELL_SORTBY
+};
+
+static const char *spl_sortchoices[NUM_SPELL_SORTBY] = {
     "by casting letter",
-#define SORTBY_LETTER 0
     "alphabetically",
-#define SORTBY_ALPHA 1
     "by level, low to high",
-#define SORTBY_LVL_LO 2
     "by level, high to low",
-#define SORTBY_LVL_HI 3
     "by skill group, alphabetized within each group",
-#define SORTBY_SKL_AL 4
     "by skill group, low to high level within group",
-#define SORTBY_SKL_LO 5
     "by skill group, high to low level within group",
-#define SORTBY_SKL_HI 6
     "maintain current ordering",
-#define SORTBY_CURRENT 7
     /* a menu choice rather than a sort choice */
     "reassign casting letters to retain current order",
-#define SORTRETAINORDER 8
 };
 static int spl_sortmode = 0;   /* index into spl_sortchoices[] */
 static int *spl_orderindx = 0; /* array of spl_book[] indices */

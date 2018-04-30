@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.h	$NHDT-Date: 1454977916 2016/02/09 00:31:56 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.6	winX.h	$NHDT-Date: 1457079196 2016/03/04 08:13:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -242,6 +242,7 @@ E boolean exit_x_event;     /* exit condition for event loop */
 #define EXIT_ON_EXIT 2
 #define EXIT_ON_SENT_EVENT 3
 E int click_x, click_y, click_button, updated_inventory;
+E boolean plsel_ask_name;
 
 typedef struct {
     Boolean slow;             /* issue prompts between map and message wins */
@@ -252,6 +253,7 @@ typedef struct {
     String tile_file;         /* name of file to open for tiles */
     String icon;              /* name of desired icon */
     int message_lines;        /* number of lines to attempt to show */
+    int extcmd_height_delta;  /* bottom margin for extended command menu */
     String pet_mark_bitmap;   /* X11 bitmap file used to mark pets */
     Pixel pet_mark_color;     /* color of pet mark */
     String pilemark_bitmap;   /* X11 bitmap file used to mark item piles */
@@ -333,6 +335,12 @@ E void FDECL(algn_key,
 E void FDECL(ec_delete, (Widget, XEvent *, String *, Cardinal *));
 E void FDECL(ec_key, (Widget, XEvent *, String *,
                       Cardinal *)); /* extended command action */
+E void FDECL(plsel_quit, (Widget, XEvent *, String *,
+                      Cardinal *)); /* player selection dialog */
+E void FDECL(plsel_play, (Widget, XEvent *, String *,
+                      Cardinal *)); /* player selection dialog */
+E void FDECL(plsel_randomize, (Widget, XEvent *, String *,
+                      Cardinal *)); /* player selection dialog */
 E void NDECL(release_extended_cmds);
 
 /* ### winstatus.c ### */

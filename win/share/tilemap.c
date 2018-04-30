@@ -1,4 +1,5 @@
-/* NetHack 3.6	tilemap.c	$NHDT-Date: 1454502429 2016/02/03 12:27:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	tilemap.c	$NHDT-Date: 1524689272 2018/04/25 20:47:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $ */
+/*      Copyright (c) 2016 by Michael Allison                     */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -21,7 +22,7 @@ extern void FDECL(exit, (int));
 #endif
 #endif
 
-#if defined(WIN32)
+#if defined(MSDOS) || defined(WIN32) || defined(X11_GRAPHICS)
 #define STATUES_LOOK_LIKE_MONSTERS
 #endif
 
@@ -464,8 +465,11 @@ FILE *ofp;
         fprintf(ofp, "%s\n", epilog[i]);
     }
 
-    fprintf(ofp, "\nint total_tiles_used = %d;\n", start);
     lastothtile = start - 1;
+#ifdef STATUES_LOOK_LIKE_MONSTERS
+    start = laststatuetile + 1;
+#endif
+    fprintf(ofp, "\nint total_tiles_used = %d;\n", start);
 }
 
 int
@@ -500,7 +504,9 @@ main()
     fprintf(ofp, "\n#define MAXMONTILE %d\n", lastmontile);
     fprintf(ofp, "#define MAXOBJTILE %d\n", lastobjtile);
     fprintf(ofp, "#define MAXOTHTILE %d\n", lastothtile);
-
+#ifdef STATUES_LOOK_LIKE_MONSTERS
+    fprintf(ofp, "/* #define MAXSTATUETILE %d */\n", laststatuetile);
+#endif
     fprintf(ofp, "\n/*tile.c*/\n");
 
     fclose(ofp);
@@ -581,10 +587,10 @@ struct {
 {S_anti_magic_trap,      "anti magic trap", "anti-magic field"},
 {S_polymorph_trap,       "polymorph trap", "polymorph trap"},
 {S_vibrating_square,     "vibrating square", "vibrating square"},
-{S_vbeam,    "vertical beam", "wall"},
-{S_hbeam,    "horizontal beam", "wall"},
-{S_lslant,   "left slant beam", "wall"},
-{S_rslant,   "right slant beam", "wall"},
+{S_vbeam,    "vertical beam", "cmap 65"},
+{S_hbeam,    "horizontal beam", "cmap 66"},
+{S_lslant,   "left slant beam", "cmap 67"},
+{S_rslant,   "right slant beam", "cmap 68"},
 {S_digbeam,  "dig beam", "cmap 69"},
 {S_flashbeam, "flash beam", "cmap 70"},
 {S_boomleft, "boom left", "cmap 71"},

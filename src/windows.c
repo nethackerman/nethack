@@ -1,4 +1,4 @@
-/* NetHack 3.6	windows.c	$NHDT-Date: 1448013599 2015/11/20 09:59:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.6	windows.c	$NHDT-Date: 1495232365 2017/05/19 22:19:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,6 +56,18 @@ extern void *FDECL(trace_procs_chain, (int, int, void *, void *, void *));
 #endif
 
 STATIC_DCL void FDECL(def_raw_print, (const char *s));
+
+#ifdef DUMPLOG
+STATIC_DCL winid FDECL(dump_create_nhwindow, (int));
+STATIC_DCL void FDECL(dump_clear_nhwindow, (winid));
+STATIC_DCL void FDECL(dump_display_nhwindow, (winid, BOOLEAN_P));
+STATIC_DCL void FDECL(dump_destroy_nhwindow, (winid));
+STATIC_DCL void FDECL(dump_start_menu, (winid));
+STATIC_DCL void FDECL(dump_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int, const char *, BOOLEAN_P));
+STATIC_DCL void FDECL(dump_end_menu, (winid, const char *));
+STATIC_DCL int FDECL(dump_select_menu, (winid, int, MENU_ITEM_P **));
+STATIC_DCL void FDECL(dump_putstr, (winid, int, const char *));
+#endif /* DUMPLOG */
 
 #ifdef HANGUPHANDLING
 volatile
@@ -226,22 +238,25 @@ const char *s;
         exit(EXIT_FAILURE);
     }
     if (!winchoices[1].procs) {
-        raw_printf("Window type %s not recognized.  The only choice is: %s.",
+        config_error_add("Window type %s not recognized.  The only choice is: %s",
                    s, winchoices[0].procs->name);
     } else {
-        raw_printf("Window type %s not recognized.  Choices are:", s);
+        char buf[BUFSZ];
+        boolean first = TRUE;
+        buf[0] = '\0';
         for (i = 0; winchoices[i].procs; i++) {
             if ('+' == winchoices[i].procs->name[0])
                 continue;
             if ('-' == winchoices[i].procs->name[0])
                 continue;
-            raw_printf("        %s", winchoices[i].procs->name);
+            Sprintf(eos(buf), "%s%s", first ? "" : ",", winchoices[i].procs->name);
+            first = FALSE;
         }
+        config_error_add("Window type %s not recognized.  Choices are: %s", s, buf);
     }
 
     if (windowprocs.win_raw_print == def_raw_print)
-        terminate(EXIT_SUCCESS);
-    wait_synch();
+        nh_terminate(EXIT_SUCCESS);
 }
 
 #ifdef WINCHAIN
@@ -459,9 +474,7 @@ static short FDECL(hup_set_font_name, (winid, char *));
 #endif
 static char *NDECL(hup_get_color_string);
 #endif /* CHANGE_COLOR */
-#ifdef STATUS_VIA_WINDOWPORT
-static void FDECL(hup_status_update, (int, genericptr_t, int, int));
-#endif
+static void FDECL(hup_status_update, (int, genericptr_t, int, int, int, unsigned long *));
 
 static int NDECL(hup_int_ndecl);
 static void NDECL(hup_void_ndecl);
@@ -511,14 +524,9 @@ static struct window_procs hup_procs = {
     hup_void_ndecl,                                   /* end_screen */
     hup_outrip, genl_preference_update, genl_getmsghistory,
     genl_putmsghistory,
-#ifdef STATUS_VIA_WINDOWPORT
     hup_void_ndecl,                                   /* status_init */
     hup_void_ndecl,                                   /* status_finish */
     genl_status_enablefield, hup_status_update,
-#ifdef STATUS_HILITES
-    genl_status_threshold,
-#endif
-#endif /* STATUS_VIA_WINDOWPORT */
     genl_can_suspend_no,
 };
 
@@ -747,17 +755,17 @@ hup_get_color_string(VOID_ARGS)
 }
 #endif /* CHANGE_COLOR */
 
-#ifdef STATUS_VIA_WINDOWPORT
 /*ARGSUSED*/
 static void
-hup_status_update(idx, ptr, chg, percent)
+hup_status_update(idx, ptr, chg, pc, color, colormasks)
 int idx UNUSED;
 genericptr_t ptr UNUSED;
-int chg UNUSED, percent UNUSED;
+int chg UNUSED, pc UNUSED, color UNUSED;
+unsigned long *colormasks UNUSED;
+
 {
     return;
 }
-#endif /* STATUS_VIA_WINDOWPORT */
 
 /*
  * Non-specific stubs.
@@ -801,7 +809,6 @@ const char *string UNUSED;
 
 #endif /* HANGUPHANDLING */
 
-#ifdef STATUS_VIA_WINDOWPORT
 
 /****************************************************************************/
 /* genl backward compat stuff                                               */
@@ -856,10 +863,11 @@ boolean enable;
 
 /* call once for each field, then call with BL_FLUSH to output the result */
 void
-genl_status_update(idx, ptr, chg, percent)
+genl_status_update(idx, ptr, chg, percent, color, colormasks)
 int idx;
 genericptr_t ptr;
-int chg UNUSED, percent UNUSED;
+int chg UNUSED, percent UNUSED, color UNUSED;
+unsigned long *colormasks UNUSED;
 {
     char newbot1[MAXCO], newbot2[MAXCO];
     long cond, *condptr = (long *) ptr;
@@ -897,12 +905,17 @@ int chg UNUSED, percent UNUSED;
           BL_LEVELDESC, BL_GOLD, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_FLUSH },
     };
 
+    /* in case interface is using genl_status_update() but has not
+       specified WC2_FLUSH_STATUS (status_update() for field values
+       is buffered so final BL_FLUSH is needed to produce output) */
+    windowprocs.wincap2 |= WC2_FLUSH_STATUS;
+
     if (idx != BL_FLUSH) {
         if (!status_activefields[idx])
             return;
         switch (idx) {
         case BL_CONDITION:
-            cond = *condptr;
+            cond = condptr ? *condptr : 0L;
             nb = status_vals[idx];
             *nb = '\0';
             if (cond & BL_MASK_STONE)
@@ -934,7 +947,8 @@ int chg UNUSED, percent UNUSED;
             break;
         default:
             Sprintf(status_vals[idx],
-                    status_fieldfmt[idx] ? status_fieldfmt[idx] : "%s", text);
+                    status_fieldfmt[idx] ? status_fieldfmt[idx] : "%s",
+                    text ? text : "");
             break;
         }
         return; /* processed one field other than BL_FLUSH */
@@ -1020,16 +1034,261 @@ int chg UNUSED, percent UNUSED;
     putmixed(WIN_STATUS, 0, newbot2); /* putmixed() due to GOLD glyph */
 }
 
-#ifdef STATUS_HILITES
+STATIC_VAR struct window_procs dumplog_windowprocs_backup;
+STATIC_VAR FILE *dumplog_file;
+
+#ifdef DUMPLOG
+STATIC_VAR time_t dumplog_now;
+
+STATIC_DCL char *FDECL(dump_fmtstr, (const char *, char *));
+
+STATIC_OVL char *
+dump_fmtstr(fmt, buf)
+const char *fmt;
+char *buf;
+{
+    const char *fp = fmt;
+    char *bp = buf;
+    int slen, len = 0;
+    char tmpbuf[BUFSZ];
+    char verbuf[BUFSZ];
+    long uid;
+    time_t now;
+
+    now = dumplog_now;
+    uid = (long) getuid();
+
+    /*
+     * Note: %t and %T assume that time_t is a 'long int' number of
+     * seconds since some epoch value.  That's quite iffy....  The
+     * unit of time might be different and the datum size might be
+     * some variant of 'long long int'.  [Their main purpose is to
+     * construct a unique file name rather than record the date and
+     * time; violating the 'long seconds since base-date' assumption
+     * may or may not interfere with that usage.]
+     */
+
+    while (fp && *fp && len < BUFSZ-1) {
+        if (*fp == '%') {
+            fp++;
+            switch (*fp) {
+            default:
+                goto finish;
+            case '\0': /* fallthrough */
+            case '%':  /* literal % */
+                Sprintf(tmpbuf, "%%");
+                break;
+            case 't': /* game start, timestamp */
+                Sprintf(tmpbuf, "%lu", (unsigned long) ubirthday);
+                break;
+            case 'T': /* current time, timestamp */
+                Sprintf(tmpbuf, "%lu", (unsigned long) now);
+                break;
+            case 'd': /* game start, YYYYMMDDhhmmss */
+                Sprintf(tmpbuf, "%08ld%06ld",
+                        yyyymmdd(ubirthday), hhmmss(ubirthday));
+                break;
+            case 'D': /* current time, YYYYMMDDhhmmss */
+                Sprintf(tmpbuf, "%08ld%06ld", yyyymmdd(now), hhmmss(now));
+                break;
+            case 'v': /* version, eg. "3.6.1-0" */
+                Sprintf(tmpbuf, "%s", version_string(verbuf));
+                break;
+            case 'u': /* UID */
+                Sprintf(tmpbuf, "%ld", uid);
+                break;
+            case 'n': /* player name */
+                Sprintf(tmpbuf, "%s", *plname ? plname : "unknown");
+                break;
+            case 'N': /* first character of player name */
+                Sprintf(tmpbuf, "%c", *plname ? *plname : 'u');
+                break;
+            }
+
+            slen = strlen(tmpbuf);
+            if (len + slen < BUFSZ-1) {
+                len += slen;
+                Sprintf(bp, "%s", tmpbuf);
+                bp += slen;
+                if (*fp) fp++;
+            } else
+                break;
+        } else {
+            *bp = *fp;
+            bp++;
+            fp++;
+            len++;
+        }
+    }
+ finish:
+    *bp = '\0';
+    return buf;
+}
+#endif /* DUMPLOG */
+
 void
-genl_status_threshold(fldidx, thresholdtype, threshold, behavior, under, over)
-int fldidx UNUSED, thresholdtype UNUSED;
-anything threshold UNUSED;
-int behavior UNUSED, under UNUSED, over UNUSED;
+dump_open_log(now)
+time_t now;
+{
+#ifdef DUMPLOG
+    char buf[BUFSZ];
+    char *fname;
+
+    dumplog_now = now;
+#ifdef SYSCF
+    if (!sysopt.dumplogfile)
+        return;
+    fname = dump_fmtstr(sysopt.dumplogfile, buf);
+#else
+    fname = dump_fmtstr(DUMPLOG_FILE, buf);
+#endif
+    dumplog_file = fopen(fname, "w");
+    dumplog_windowprocs_backup = windowprocs;
+
+#else /*!DUMPLOG*/
+    nhUse(now);
+#endif /*?DUMPLOG*/
+}
+
+void
+dump_close_log()
+{
+    if (dumplog_file) {
+        (void) fclose(dumplog_file);
+        dumplog_file = (FILE *) 0;
+    }
+}
+
+void
+dump_forward_putstr(win, attr, str, no_forward)
+winid win;
+int attr;
+const char *str;
+int no_forward;
+{
+    if (dumplog_file)
+        fprintf(dumplog_file, "%s\n", str);
+    if (!no_forward)
+        putstr(win, attr, str);
+}
+
+/*ARGSUSED*/
+STATIC_OVL void
+dump_putstr(win, attr, str)
+winid win UNUSED;
+int attr UNUSED;
+const char *str;
+{
+    if (dumplog_file)
+        fprintf(dumplog_file, "%s\n", str);
+}
+
+STATIC_OVL winid
+dump_create_nhwindow(dummy)
+int dummy;
+{
+    return dummy;
+}
+
+/*ARGUSED*/
+STATIC_OVL void
+dump_clear_nhwindow(win)
+winid win UNUSED;
 {
     return;
 }
-#endif /* STATUS_HILITES */
-#endif /* STATUS_VIA_WINDOWPORT */
+
+/*ARGSUSED*/
+STATIC_OVL void
+dump_display_nhwindow(win, p)
+winid win UNUSED;
+boolean p UNUSED;
+{
+    return;
+}
+
+/*ARGUSED*/
+STATIC_OVL void
+dump_destroy_nhwindow(win)
+winid win UNUSED;
+{
+    return;
+}
+
+/*ARGUSED*/
+STATIC_OVL void
+dump_start_menu(win)
+winid win UNUSED;
+{
+    return;
+}
+
+/*ARGSUSED*/
+STATIC_OVL void
+dump_add_menu(win, glyph, identifier, ch, gch, attr, str, preselected)
+winid win UNUSED;
+int glyph UNUSED;
+const anything *identifier UNUSED;
+char ch;
+char gch UNUSED;
+int attr UNUSED;
+const char *str;
+boolean preselected UNUSED;
+{
+    if (dumplog_file) {
+        if (glyph == NO_GLYPH)
+            fprintf(dumplog_file, " %s\n", str);
+        else
+            fprintf(dumplog_file, "  %c - %s\n", ch, str);
+    }
+}
+
+/*ARGSUSED*/
+STATIC_OVL void
+dump_end_menu(win, str)
+winid win UNUSED;
+const char *str;
+{
+    if (dumplog_file) {
+        if (str)
+            fprintf(dumplog_file, "%s\n", str);
+        else
+            fputs("\n", dumplog_file);
+    }
+}
+
+STATIC_OVL int
+dump_select_menu(win, how, item)
+winid win UNUSED;
+int how UNUSED;
+menu_item **item;
+{
+    *item = (menu_item *) 0;
+    return 0;
+}
+
+void
+dump_redirect(onoff_flag)
+boolean onoff_flag;
+{
+    if (dumplog_file) {
+        if (onoff_flag) {
+            windowprocs.win_create_nhwindow = dump_create_nhwindow;
+            windowprocs.win_clear_nhwindow = dump_clear_nhwindow;
+            windowprocs.win_display_nhwindow = dump_display_nhwindow;
+            windowprocs.win_destroy_nhwindow = dump_destroy_nhwindow;
+            windowprocs.win_start_menu = dump_start_menu;
+            windowprocs.win_add_menu = dump_add_menu;
+            windowprocs.win_end_menu = dump_end_menu;
+            windowprocs.win_select_menu = dump_select_menu;
+            windowprocs.win_putstr = dump_putstr;
+        } else {
+            windowprocs = dumplog_windowprocs_backup;
+        }
+        iflags.in_dumplog = onoff_flag;
+    } else {
+        iflags.in_dumplog = FALSE;
+    }
+}
 
 /*windows.c*/
