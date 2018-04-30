@@ -1010,5 +1010,19 @@ int sql_complete_objective(const char *category, const char *objective)
 	return 0;
 }
 
+int sql_quest_completed(void)
+{
+	int completed = 0;
+	MYSQL_RES *res = sql_query("select distinct player_id from score where clan_id=%d and objective_id=(select id from nhtour.objectives where name='kill_oracle' limit 1) group by player_id", we->clan_id);
 
+	if(NULL == res)
+	{
+		return 0;
+	}
+
+	completed = (((int)mysql_num_rows(res)) >= we->num_members);
+	mysql_free_result(res);
+
+	return completed;
+}
 

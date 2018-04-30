@@ -1913,7 +1913,8 @@ register struct monst *mtmp;
             { PM_BLACK_DRAGON,      "blackdragon"   },
             { PM_MASTER_MIND_FLAYER, "mastermindflayer" },
             { PM_ARCH_LICH,         "archlich"      },
-            { PM_ARCHON,            "archon"        }
+            { PM_ARCHON,            "archon"        },
+            { PM_ORACLE,            "oracle"        }
         };
 
         if(is_unicorn(mtmp->data))

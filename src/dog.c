@@ -119,6 +119,9 @@ boolean quietly;
     mtmp->msleeping = 0;
     if (otmp) { /* figurine; resulting monster might not become a pet */
         chance = rn2(10); /* 0==tame, 1==peaceful, 2==hostile */
+        if(PM_DEN_FULLE_DANSKEH == otmp->corpsenm) {
+            chance = 0;
+        }
         if (chance > 2)
             chance = otmp->blessed ? 0 : !otmp->cursed ? 1 : 2;
         /* 0,1,2:  b=80%,10,10; nc=10%,80,10; c=10%,10,80 */

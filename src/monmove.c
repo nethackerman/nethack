@@ -332,6 +332,25 @@ struct monst *mon;
 /* The whole dochugw/m_move/distfleeck/mfndpos section is serious spaghetti
  * code. --KAA
  */
+static int total_pils(mtmp)
+struct  monst *mtmp;
+{
+    struct obj *obj;
+    int pils = 0;
+
+    for(obj = mtmp->minvent; obj; obj = obj->nobj)
+    {
+        switch (obj->otyp)
+        {
+            case POT_BOOZE:
+                pils += obj->quan;
+                break;
+        }
+    }
+
+    return pils;
+}
+
 int
 dochug(mtmp)
 register struct monst *mtmp;
@@ -423,6 +442,33 @@ register struct monst *mtmp;
 
     /* check distance and scariness of attacks */
     distfleeck(mtmp, &inrange, &nearby, &scared);
+
+    //
+    // Dansk always prioritize booze
+    //
+    if(PM_DEN_FULLE_DANSKEH == monsndx(mtmp->data)) {
+        int drink = --mtmp->mspare1 <= 0;
+
+        if(drink) {
+            struct obj *obj;
+            mtmp->mspare1 = 15;
+            for(obj = mtmp->minvent; obj; obj = obj->nobj) {
+                switch (obj->otyp) {
+                    case POT_BOOZE:
+                        m_useup(mtmp, obj);
+                        pline("%s slurs \"PILSEDAEGS!\" (%d Tuborg Guld left)", Monnam(mtmp), total_pils(mtmp));
+                        return 0;
+                }
+            }
+
+            pline("%s slurs:", Monnam(mtmp));
+            verbalize("FAEEEN MAEHN IKKE NOK PIELS EHBLIR OGGGE RÖDDEHEEMHHEGÖÖAEEE");
+            pline("Having ran out of Tuborg Guld, %s vanishes into the night.", Monnam(mtmp));
+            mtmp->mhp = 0;
+            mongone(mtmp);
+            return 1;
+        }
+    }
 
     if (find_defensive(mtmp)) {
         if (use_defensive(mtmp) != 0)

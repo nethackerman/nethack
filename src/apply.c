@@ -35,7 +35,7 @@ STATIC_DCL int FDECL(use_pole, (struct obj *));
 STATIC_DCL int FDECL(use_cream_pie, (struct obj *));
 STATIC_DCL int FDECL(use_grapple, (struct obj *));
 STATIC_DCL int FDECL(do_break_wand, (struct obj *));
-STATIC_DCL boolean FDECL(figurine_location_checks, (struct obj *,
+boolean FDECL(figurine_location_checks, (struct obj *,
                                                     coord *, BOOLEAN_P));
 STATIC_DCL void FDECL(add_class, (char *, CHAR_P));
 STATIC_DCL void FDECL(setapplyclasses, (char *));
@@ -2043,7 +2043,7 @@ long timeout;
         newsym(cc.x, cc.y);
 }
 
-STATIC_OVL boolean
+boolean
 figurine_location_checks(obj, cc, quietly)
 struct obj *obj;
 coord *cc;

@@ -79,6 +79,7 @@ int sql_get_clan_state(unsigned int clan_id, struct clan_state *state);
 int sql_get_player_state(unsigned int player_id, struct player_state *state);
 int sql_decrement_curse_turns(int *turns_left, const char **by);
 int sql_complete_objective(const char *category, const char *objective);
+int sql_quest_completed(void);
 
 #endif
 

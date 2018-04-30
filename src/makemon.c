@@ -20,7 +20,7 @@ STATIC_DCL int FDECL(align_shift, (struct permonst *));
 STATIC_DCL boolean FDECL(mk_gen_ok, (int, int, int));
 STATIC_DCL boolean FDECL(wrong_elem_type, (struct permonst *));
 STATIC_DCL void FDECL(m_initgrp, (struct monst *, int, int, int));
-STATIC_DCL void FDECL(m_initthrow, (struct monst *, int, int));
+void FDECL(m_initthrow, (struct monst *, int, int));
 STATIC_DCL void FDECL(m_initweap, (struct monst *));
 STATIC_DCL void FDECL(m_initinv, (struct monst *));
 STATIC_DCL boolean FDECL(makemon_rnd_goodpos, (struct monst *, unsigned, coord *));
@@ -145,7 +145,6 @@ register int x, y, n;
     }
 }
 
-STATIC_OVL
 void
 m_initthrow(mtmp, otyp, oquan)
 struct monst *mtmp;
@@ -1199,7 +1198,8 @@ int mmflags;
         new_light_source(mtmp->mx, mtmp->my, ct, LS_MONSTER,
                          monst_to_any(mtmp));
     mitem = 0; /* extra inventory item for this monster */
-
+    if(mndx == PM_DEN_FULLE_DANSKEH)
+        mtmp->mspare1 = 0;
     if (mndx == PM_VLAD_THE_IMPALER)
         mitem = CANDELABRUM_OF_INVOCATION;
     mtmp->cham = NON_PM; /* default is "not a shapechanger" */

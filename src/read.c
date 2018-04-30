@@ -950,6 +950,273 @@ int state;
     }
 }
 
+static struct obj *_quick_item(int id, int init, int quan, int spe, int mon)
+{
+    struct obj *obj = mksobj(id, init, FALSE);
+    obj->corpsenm = mon;
+    obj->quan = quan;
+    if(0 != spe)
+    {
+       obj->spe = spe;
+    }
+    obj->owt = weight(obj);
+
+    fully_identify_obj(obj);
+
+    return obj;
+}
+
+static void _golden_ticket_item(int id, int quan, int spe, int mon)
+{
+    struct obj *obj = _quick_item(id, TRUE, quan, spe, mon);
+    bless(obj);
+    addinv(obj);
+    oname(obj, "from golden ticket");
+}
+
+static int _spawn_den_dansk(void)
+{
+    struct obj *obj;
+    struct monst *dansk;
+    coord cc;
+
+    if(u.uswallow)
+    {
+        You("cannot do that while being swallowed.");
+        return 0;
+    }
+    if(!getdir((char *) 0))
+    {
+        context.move = multi = 0;
+        return 0;
+    }
+
+    cc.x = u.ux + u.dx;
+    cc.y = u.uy + u.dy;
+
+    obj = mksobj(FIGURINE, TRUE, FALSE);
+
+    obj->corpsenm = PM_DEN_FULLE_DANSKEH;
+    bless(obj);
+
+    if(!figurine_location_checks(obj, &cc, TRUE))
+    {
+        You("must choose a different direction.");
+        dealloc_obj(obj);
+        return 0;
+    }
+
+    dansk = make_familiar(obj, cc.x, cc.y, FALSE);
+    (void)stop_timer(FIG_TRANSFORM, obj_to_any(obj));
+
+    dealloc_obj(obj);
+
+    obj = mksobj(POT_BOOZE, TRUE, FALSE);
+    bless(obj);
+    obj->quan = 24;
+    obj->owt = weight(obj);
+    (void) mpickobj(dansk, obj);
+
+    obj = mksobj(CREAM_PIE, TRUE, FALSE);
+    obj->quan = 1 + rn2(3);
+    obj->owt = weight(obj);
+    (void) mpickobj(dansk, obj);
+
+    pline("%s slurs:", Monnam(dansk));
+    verbalize("JÄÄÄEEEHHHFOOEEERREN JÄÄEEEVEL RÖÖÖEEEBEDÖÖEEUUUR!!!");
+
+    _golden_ticket_item(MAGIC_WHISTLE, 1, 0, 0);
+
+    return 1;
+}
+
+static int _spawn_health(void)
+{
+    _golden_ticket_item(POT_FULL_HEALING, 5, 0, 0);
+    pline("Potions were added to your inventory!");
+    return 1;
+}
+
+static int _spawn_poison_tin(void)
+{
+    _golden_ticket_item(TIN, 1, 0, PM_GREEN_DRAGON);
+    _golden_ticket_item(TIN, 1, 0, PM_ORANGE_DRAGON);
+    _golden_ticket_item(TOWEL, 1, 0, 0);
+    pline("Two tins (and a towel to wash up) was added to your inventory!");
+    return 1;
+}
+
+static int _spawn_food(void)
+{
+    _golden_ticket_item(HORN_OF_PLENTY, 1, 0, 0);
+    pline("A magnificent horn was added to your inventory!");
+    return 1;
+}
+
+static int _spawn_armor(void)
+{
+    _golden_ticket_item(DWARVISH_MITHRIL_COAT, 1, 1, 0);
+    pline("An armor was added to your inventory!");
+    return 1;
+}
+
+static int _spawn_speed(void)
+{
+    _golden_ticket_item(SPEED_BOOTS, 1, 0, 0);
+    pline("A pair of shiny new boots were added to your inventory!");
+    return 1;
+}
+
+static int _spawn_wand(void)
+{
+    _golden_ticket_item(WAN_DEATH, 1, 2 + rnd(3), 0);
+    pline("A highly destructive wand was added to your inventory! Be careful.");
+    return 1;
+}
+
+static int _spawn_poly(void)
+{
+    _golden_ticket_item(WAN_POLYMORPH, 1, 2 + rnd(3), 0);
+    pline("A strange wand was added to your inventory!");
+    return 1;
+}
+
+static int _spawn_gauntlets(void)
+{
+    _golden_ticket_item(GAUNTLETS_OF_POWER, 1, 0, 0);
+    pline("A pair of powerful gloves were added to your inventory!");
+    return 1;
+}
+
+static int _spawn_partykit(void)
+{
+    struct obj *icebox = _quick_item(ICE_BOX, FALSE, 1, 0, 0);
+    struct obj *obj = _quick_item(CORPSE, TRUE, 1, 0, PM_NURSE);
+    curse(obj);
+    add_to_container(icebox, obj);
+    obj = _quick_item(CORPSE, TRUE, 1, 0, PM_SUCCUBUS);
+    curse(obj);
+    add_to_container(icebox, obj);
+    add_to_container(icebox, _quick_item(POT_HALLUCINATION, TRUE, 10 + rnd(10), 0, 0));
+    add_to_container(icebox, _quick_item(POT_BOOZE, TRUE, 6, 0, 0));
+    add_to_container(icebox, _quick_item(CORPSE, TRUE, 20 + rnd(20), 0, PM_VIOLET_FUNGUS));
+    obj = _quick_item(UNICORN_HORN, TRUE, 1, 0, 0);
+    bless(obj);
+    oname(obj, "Kalles hangover cure");
+    add_to_container(icebox, obj);
+    obj = _quick_item(SKELETON_KEY, TRUE, 1, 0, 0);
+    oname(obj, "Kalles lost house keys");
+    add_to_container(icebox, obj);
+    obj = _quick_item(LEATHER_JACKET, TRUE, 1, 0, 0);
+    oname(obj, "Kalles lost jacket");
+    add_to_container(icebox, obj);
+    obj = _quick_item(IRON_SHOES, TRUE, 1, 0, 0);
+    oname(obj, "Kalles lost boots");
+    add_to_container(icebox, obj);
+    oname(icebox, "Kalles Partykit!");
+    place_object(icebox, u.ux, u.uy);
+    pline("The gods have bestowed upon you Kalles Partykit. It is by your feet.");
+    return 1;
+}
+
+static int _spawn_marker(void)
+{
+    _golden_ticket_item(MAGIC_MARKER, 1, 0, 0);
+    pline("A magical marker has been placed in your inventory!");
+    return 1;
+}
+
+static int _spawn_tinningkit(void)
+{
+    _golden_ticket_item(TINNING_KIT, 1, 0, 0);
+    pline("This Tinningkit will aid you against the trolls.");
+    return 1;
+}
+
+static int _spawn_mr(void)
+{
+    _golden_ticket_item(CLOAK_OF_MAGIC_RESISTANCE, 1, 0, 0);
+    pline("A gorgeous cloak was added to your inventory!");
+    return 1;
+}
+
+static int _spawn_weapon_enchant(void)
+{
+    _golden_ticket_item(SCR_ENCHANT_WEAPON, 2, 0, 0);
+    pline("Two powerful scrolls were added to your inventory!");
+    return 1;
+}
+
+struct ticket_rewards
+{
+    char *title;
+    int (*callback)(void);
+};
+
+static const struct ticket_rewards rewards[] = 
+{
+    { "My health keeps running out", _spawn_health },
+    { "My immune system is so bad", _spawn_poison_tin },
+    { "I am always hungry", _spawn_food },
+    { "Everything always hits me!", _spawn_armor },
+    { "I am sooo slow :(", _spawn_speed },
+    { "I wish I could kill everything!", _spawn_wand },
+    { "I want to change to world!", _spawn_poly },
+    { "I am a wimpy weakling!", _spawn_gauntlets },
+    { "I want to learn how to write", _spawn_marker },
+    { "Trollbane +7 please.", _spawn_tinningkit },
+    { "These spellcasers are too much!", _spawn_mr },
+    { "My weapon sucks!", _spawn_weapon_enchant },
+    { "Kalles Partykit", _spawn_partykit },
+    { "Sommarpils med Niels", _spawn_den_dansk }
+};
+
+static int read_golden_ticket(sobj)
+struct obj *sobj;
+{
+    unsigned int i;
+    menu_item *pick_list;
+    anything any = zeroany;
+    winid tmpwin;
+
+    tmpwin = create_nhwindow(NHW_MENU);
+
+    start_menu(tmpwin);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_INVERSE, "What reward to you wish to claim?", MENU_UNSELECTED);
+
+    for(i = 0; i != sizeof(rewards) / sizeof(rewards[0]); ++i)
+    {
+        any.a_int = i + 1;
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, rewards[i].title, MENU_UNSELECTED);
+    }
+
+    end_menu(tmpwin, "The gods are anxiously awaiting your answer.");
+
+    i = -1;
+
+    if(select_menu(tmpwin, PICK_ONE, &pick_list) > 0)
+    {
+        i = pick_list[0].item.a_char - 1;
+        free(pick_list);
+    }
+
+    destroy_nhwindow(tmpwin);
+
+    if(-1 != i)
+    {
+        if(rewards[i].callback())
+        {
+            useup(sobj);
+        }
+    }
+    else
+    {
+        You("decide not to claim your golden ticket just yet.");
+    }
+
+    return 1;
+}
+
 /* scroll effects; return 1 if we use up the scroll and possibly make it
    become discovered, 0 if caller should take care of those side-effects */
 int
@@ -1463,6 +1730,9 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             pline("You're not carrying anything to be identified.");
         }
         break;
+    case SCR_GOLDEN_TICKET:
+        return read_golden_ticket(sobj);
+
     case SCR_CHARGING:
         if (confused) {
             if (scursed) {

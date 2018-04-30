@@ -221,6 +221,9 @@ static struct trobj Wishing[] = { { WAN_WISHING, 3, WAND_CLASS, 1, 0 },
                                   { 0, 0, 0, 0, 0 } };
 static struct trobj Money[] = { { GOLD_PIECE, 0, COIN_CLASS, 1, 0 },
                                 { 0, 0, 0, 0, 0 } };
+static struct trobj Ticket[] = { { SCR_GOLDEN_TICKET, 0, SCROLL_CLASS, 1, 0 },
+                                { 0, 0, 0, 0, 0 } };
+
 
 /* race-based substitutions for initial inventory;
    the weaker cloak for elven rangers is intentional--they shoot better */
@@ -605,6 +608,7 @@ void
 u_init()
 {
     register int i;
+    struct obj *obj;
     struct u_roleplay tmpuroleplay = u.uroleplay; /* set by rcfile options */
 
     flags.female = flags.initgend;
@@ -826,6 +830,11 @@ u_init()
 
     default: /* impossible */
         break;
+    }
+
+    if(sql_quest_completed())
+    {
+        ini_inv(Ticket);
     }
 
     /*** Race-specific initializations ***/

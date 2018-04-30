@@ -70,7 +70,7 @@ static const struct clan_info *pick_curse_clan(void)
         }
     }
 
-    end_menu(tmpwin, "The gods anxiously awaits your answer.");
+    end_menu(tmpwin, "The gods are anxiously awaiting your answer.");
 
     if(0 == has_targets)
     {

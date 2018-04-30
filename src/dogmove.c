@@ -107,6 +107,17 @@ struct monst *mon;
             break;
         }
 
+        if(mon->mtame && PM_DEN_FULLE_DANSKEH == monsndx(mon->data))
+        {
+            if(CREAM_PIE == obj->otyp || POT_BOOZE == obj->otyp)
+            {
+                //
+                // Not parting with either one...
+                //
+                continue;
+            }
+        }
+
         if (!obj->owornmask && obj != wep)
             return obj;
     }
@@ -405,6 +416,24 @@ int udist;
     omx = mtmp->mx;
     omy = mtmp->my;
 
+    obj = level.objects[omx][omy];
+
+    if(obj)
+    {
+        if(POT_BOOZE == obj->otyp
+        && PM_DEN_FULLE_DANSKEH == monsndx(mtmp->data)
+        && could_reach_item(mtmp, obj->ox, obj->oy))
+        {
+            obj_extract_self(obj);
+            newsym(omx, omy);
+            (void)mpickobj(mtmp, obj);
+            pline("%s slurs: ", Monnam(mtmp));
+            verbalize("FY FAAEEN MAN FLÖÖÖDEEEH AEEEG FANN MAEEH EN PILSE EGH!");
+
+            return 0;
+        }
+    }
+
     /* If we are carrying something then we drop it (perhaps near @).
      * Note: if apport == 1 then our behaviour is independent of udist.
      * Use udist+1 so steed won't cause divide by zero.
@@ -431,7 +460,6 @@ int udist;
                  || (edog->mhpmax_penalty && edible == ACCFOOD))
                 && could_reach_item(mtmp, obj->ox, obj->oy))
                 return dog_eat(mtmp, obj, omx, omy, FALSE);
-
             carryamt = can_carry(mtmp, obj);
             if (carryamt > 0 && !obj->cursed
                 && could_reach_item(mtmp, obj->ox, obj->oy)) {

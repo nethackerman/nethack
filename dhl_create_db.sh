@@ -119,12 +119,13 @@ insert into objectives values(0, 'kill_giantmimic',			"Kill a Giant Mimic",			50
 insert into objectives values(0, 'kill_wererat',			"Kill a Wererat",				500,	5, NOW());
 insert into objectives values(0, 'kill_soldierant',			"Kill a Soldier Ant",			500,	5, NOW());
 insert into objectives values(0, 'kill_mumak',				"Kill a Mumak",					500,	5, NOW());
-insert into objectives values(0, 'kill_cockatrice',			"Kill a Cockatrice",			500,	5, NOW());
-insert into objectives values(0, 'kill_warhorse',			"Kill a Warhorse",				500,	5, NOW());
-insert into objectives values(0, 'kill_blackdragon',		"Kill a Black Dragon",			500,	5, NOW());
-insert into objectives values(0, 'kill_mastermindflayer',	"Kill a Master Mind Flayer",	500,	5, NOW());
-insert into objectives values(0, 'kill_archlich',			"Kill an Archlich",				500,	5, NOW());
-insert into objectives values(0, 'kill_archon',				"Kill an Archon",				500,	5, NOW());
+insert into objectives values(0, 'kill_cockatrice',			"Kill a Cockatrice",			1000,	5, NOW());
+insert into objectives values(0, 'kill_warhorse',			"Kill a Warhorse",				1000,	5, NOW());
+insert into objectives values(0, 'kill_blackdragon',		"Kill a Black Dragon",			1500,	5, NOW());
+insert into objectives values(0, 'kill_mastermindflayer',	"Kill a Master Mind Flayer",	1500,	5, NOW());
+insert into objectives values(0, 'kill_archlich',			"Kill an Archlich",				1500,	5, NOW());
+insert into objectives values(0, 'kill_archon',				"Kill an Archon",				1500,	5, NOW());
+insert into objectives values(0, 'kill_oracle',				"Kill the evil Oracle",			5000,	10, NOW());
 
 --
 -- Kill specials
@@ -206,7 +207,7 @@ insert into clan_members values(0, 2, 10, 'filled', null);
 insert into clan_members values(0, 2, 11, 'filled', null);
 
 
-insert into games values(0, "Test Tournament", DATE_ADD(NOW(), INTERVAL 1000 HOUR), DATE_ADD(NOW(), INTERVAL 2000 HOUR), NOW());
+insert into games values(0, "Test Tournament", NOW(), DATE_ADD(NOW(), INTERVAL 2000 HOUR), NOW());
 insert into game_participants values(0, 1, 1, NOW());
 insert into game_participants values(0, 1, 2, NOW());
 

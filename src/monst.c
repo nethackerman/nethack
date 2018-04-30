@@ -2200,12 +2200,12 @@ struct permonst _mons2[] = {
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_STRONG | M2_COLLECT,
         M3_INFRAVISIBLE | M3_CLOSE, HI_DOMESTIC),
-    MON("Oracle", S_HUMAN, LVL(12, 0, 0, 50, 0), (G_NOGEN | G_UNIQ),
-        A(ATTK(AT_NONE, AD_MAGM, 0, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+    MON("Oracle", S_HUMAN, LVL(5, 8, 10, 0, 0), (G_NOGEN | G_UNIQ),
+        A(ATTK(AT_NONE, AD_MAGM, 0, 3), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_ORACLE, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_OMNIVORE,
-        M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_FEMALE, M3_INFRAVISIBLE,
+        M2_NOPOLY | M2_HUMAN | M2_FEMALE, M3_INFRAVISIBLE,
         HI_ZAP),
     /* aligned priests always have the epri extension attached;
        individual instantiations should always have either ispriest
@@ -2601,6 +2601,18 @@ struct permonst _mons2[] = {
             | M1_POIS,
         M2_NOPOLY | M2_STALK | M2_PEACEFUL, M3_INFRAVISIBLE | M3_INFRAVISION,
         CLR_YELLOW),
+
+    MON("Den Fulle Danskeh", S_HUMAN, LVL(110, 16, -8, 80, 15),
+        (G_NOGEN | G_NOHELL | G_NOCORPSE | 1),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 50), ATTK(AT_WEAP, AD_PHYS, 2, 50),
+          ATTK(AT_GAZE, AD_BLND, 2, 50), ATTK(AT_CLAW, AD_PHYS, 1, 50),
+          ATTK(AT_MAGC, AD_SPEL, 4, 50), NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_CUSS, MZ_LARGE),
+        MR_FIRE | MR_COLD | MR_ELEC | MR_SLEEP | MR_POISON, 0,
+        M1_FLY | M1_HUMANOID | M1_SEE_INVIS | M1_REGEN,
+        M2_NOPOLY | M2_MINION | M2_STALK | M2_STRONG | M2_LORD
+            | M2_COLLECT | M2_MAGIC,
+        M3_INFRAVISIBLE | M3_INFRAVISION, CLR_BROWN),
 
     MON("djinni", S_DEMON, LVL(7, 12, 4, 30, 0), (G_NOGEN | G_NOCORPSE),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 8), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,

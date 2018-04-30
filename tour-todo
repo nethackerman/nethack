@@ -1,3 +1,6 @@
+TODO v2:
+- Fix constants SQL_blah. move to database.
+
 c-todo:
 survive for N turns! -> award
 TWoD: Naming is shot to shit, explicitly name it The i think
