@@ -316,7 +316,7 @@ attempt_restore:
             dosave0();
         }
         clearlocks();
-        terminate(EXIT_SUCCESS);
+        nh_terminate(EXIT_SUCCESS);
         return 0;
     }
 
@@ -611,13 +611,7 @@ port_help()
 boolean
 authorize_wizard_mode()
 {
-<<<<<<< HEAD
     if (sysopt.wizards && sysopt.wizards[0]) {
-=======
-    struct passwd *pw = get_unix_pw();
-
-    if (pw && sysopt.wizards && sysopt.wizards[0]) {
->>>>>>> upstream/NetHack-3.6.0
         if (check_user_string(sysopt.wizards))
             return TRUE;
     }
@@ -660,12 +654,7 @@ char *optstr;
 {
     int pwlen;
     char *eop, *w;
-<<<<<<< HEAD
     char *pwname = plname;
-=======
-    char *pwname;
-
->>>>>>> upstream/NetHack-3.6.0
     if (optstr[0] == '*')
         return TRUE; /* allow any user */
     pwlen = strlen(pwname);

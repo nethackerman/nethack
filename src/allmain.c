@@ -77,8 +77,8 @@ boolean resuming;
 
     sql_set_player_ingame(1); /* This could fail, but its ok-ish */
 
-    if (wizard)
-        add_debug_extended_commands();
+    //if (wizard)
+    //    add_debug_extended_commands();
 
     /* if a save file created in normal mode is now being restored in
        explore mode, treat it as normal restore followed by 'X' command

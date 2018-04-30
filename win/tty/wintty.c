@@ -2203,11 +2203,7 @@ boolean blocking; /* with ttys, all windows are blocking */
             tty_display_nhwindow(WIN_MESSAGE, TRUE);
             return;
         }
-<<<<<<< HEAD
-    case NHW_COMM:
-=======
         /*FALLTHRU*/
->>>>>>> upstream/NetHack-3.6.0
     case NHW_BASE:
         (void) fflush(stdout);
         break;

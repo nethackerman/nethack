@@ -1336,7 +1336,7 @@ void
 freedynamicdata()
 {
 #if defined(UNIX) && defined(MAIL)
-    free_maildata();
+    // free_maildata();
 #endif
     unload_qtlist();
     free_menu_coloring();
