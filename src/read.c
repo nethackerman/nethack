@@ -1010,6 +1010,7 @@ static void _golden_ticket_item(int id, int quan, int spe, int mon)
     struct obj *obj = _quick_item(id, TRUE, quan, spe, mon);
     bless(obj);
     addinv(obj);
+    obj->startgear = 1;
     oname(obj, "from golden ticket");
 }
 
@@ -1146,6 +1147,9 @@ static int _spawn_partykit(void)
     obj = _quick_item(SKELETON_KEY, TRUE, 1, 0, 0);
     oname(obj, "Kalles lost house keys");
     add_to_container(icebox, obj);
+    obj = _quick_item(LENSES, TRUE, 1, 0, 0);
+    oname(obj, "Kalles lost glasses");
+    add_to_container(icebox, obj);
     obj = _quick_item(LEATHER_JACKET, TRUE, 1, 0, 0);
     oname(obj, "Kalles lost jacket");
     add_to_container(icebox, obj);
@@ -1206,7 +1210,7 @@ static const struct ticket_rewards rewards[] =
     { "Trollbane +7 please.", _spawn_tinningkit },
     { "These spellcasers are too much!", _spawn_mr },
     { "My weapon sucks!", _spawn_weapon_enchant },
-    { "Kalles Partykit", _spawn_partykit },
+    { "Chockfest med Kalle", _spawn_partykit },
     { "Sommarpils med Niels", _spawn_den_dansk }
 };
 

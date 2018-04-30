@@ -191,7 +191,7 @@
 
 #ifndef SYSCF
 #define SYSCF                /* use a global configuration */
-#define SYSCF_FILE "/nh360/sysconf" /* global configuration is in a file */
+#define SYSCF_FILE "/nh361/sysconf" /* global configuration is in a file */
 #endif
 
 #ifndef GDBPATH
@@ -345,7 +345,7 @@
  * otherwise it will be the current directory.
  */
 #ifndef HACKDIR
-#define HACKDIR "/nh360"
+#define HACKDIR "/nh361"
 #endif
 
 /*
