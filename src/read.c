@@ -1131,10 +1131,7 @@ static int _spawn_gauntlets(void)
 static int _spawn_partykit(void)
 {
     struct obj *icebox = _quick_item(ICE_BOX, FALSE, 1, 0, 0);
-    struct obj *obj = _quick_item(CORPSE, TRUE, 1, 0, PM_NURSE);
-    curse(obj);
-    add_to_container(icebox, obj);
-    obj = _quick_item(CORPSE, TRUE, 1, 0, PM_SUCCUBUS);
+    struct obj *obj = _quick_item(CORPSE, TRUE, 1, 0, PM_SUCCUBUS);
     curse(obj);
     add_to_container(icebox, obj);
     add_to_container(icebox, _quick_item(POT_HALLUCINATION, TRUE, 10 + rnd(10), 0, 0));
@@ -1156,16 +1153,21 @@ static int _spawn_partykit(void)
     obj = _quick_item(IRON_SHOES, TRUE, 1, 0, 0);
     oname(obj, "Kalles lost boots");
     add_to_container(icebox, obj);
-    oname(icebox, "Kalles Partykit!");
+    oname(icebox, "Party aftermath");
     place_object(icebox, u.ux, u.uy);
-    pline("The gods have bestowed upon you Kalles Partykit. It is by your feet.");
+
+    make_vomiting(1, FALSE);
+
+    pline("You party with Kalle but remember nothing. You are hungover.");
+    more();
+    pline("There is a strange box by your feet.");
     return 1;
 }
 
 static int _spawn_marker(void)
 {
     _golden_ticket_item(MAGIC_MARKER, 1, 0, 0);
-    pline("A magical marker has been placed in your inventory!");
+    pline("The gods have bestowed upon you a magical marker!");
     return 1;
 }
 
@@ -1198,15 +1200,15 @@ struct ticket_rewards
 
 static const struct ticket_rewards rewards[] = 
 {
-    { "My health keeps running out", _spawn_health },
-    { "My immune system is so bad", _spawn_poison_tin },
-    { "I am always hungry", _spawn_food },
-    { "Everything always hits me!", _spawn_armor },
+    { "My health keeps running out.", _spawn_health },
+    { "My immune system is so bad.", _spawn_poison_tin },
+    { "I am always hungry.", _spawn_food },
+    { "Everything always hits me.", _spawn_armor },
     { "I am sooo slow :(", _spawn_speed },
     { "I wish I could kill everything!", _spawn_wand },
-    { "I want to change to world!", _spawn_poly },
-    { "I am a wimpy weakling!", _spawn_gauntlets },
-    { "I want to learn how to write", _spawn_marker },
+    { "I want to change to world.", _spawn_poly },
+    { "If only I was strong...", _spawn_gauntlets },
+    { "My handwriting could use practice.", _spawn_marker },
     { "Trollbane +7 please.", _spawn_tinningkit },
     { "These spellcasers are too much!", _spawn_mr },
     { "My weapon sucks!", _spawn_weapon_enchant },

@@ -872,6 +872,7 @@ struct obj *obj;
 {
     switch (obj->oclass) {
     case TOOL_CLASS:
+        if(PAGER == obj->otyp) return TRUE;
         /* it's possible for a rusty weptool to be polymorphed into some
            non-weptool iron tool, in which case the rust implicitly goes
            away, but it's also possible for it to be polymorphed into a

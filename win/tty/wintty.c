@@ -3979,6 +3979,8 @@ static const struct comm_graphics device[] =
 #define MAX_MESSAGE_LEN 61
 #define INPUT_X 10
 #define INPUT_Y 23
+#define LINE_WIDTH 73
+
 #define MEMBERS_X 11
 #define MEMBERS_Y 4
 
@@ -4128,10 +4130,8 @@ static int update_chat(winid comm, int force_invalidation)
 
     for(i = 0; i < chat_history.num_messages; ++i)
     {
-        int nuke;
+        int len;
         struct chat_message * const msg = &chat_history.history[i];
-        msg->msg[MAX_MESSAGE_LEN] = 0;
-        msg->name[10] = 0;
 
         tty_curs(comm, CHAT_NEWEST_X, CHAT_NEWEST_Y - i);
 
@@ -4144,16 +4144,22 @@ static int update_chat(winid comm, int force_invalidation)
             tty_putstr(comm, 0, ": ");
 
             term_start_color(CLR_WHITE);
+            msg->msg[MAX_MESSAGE_LEN] = 0;
+
             tty_putstr(comm, 0, msg->msg);
+
+            len = strlen(msg->name) + 2 + strlen(msg->msg);
         }
         else
         {
             term_start_color(CHAT_TYPE_CRITICAL == msg->type ? CLR_RED : CLR_GREEN);
+            msg->msg[LINE_WIDTH - 4] = 0; // hackfuck
             tty_putstr(comm, 0, "*** ");
             tty_putstr(comm, 0, msg->msg);
+            len = 4 + strlen(msg->msg);
         }
 
-        for(nuke = strlen(msg->msg); nuke < MAX_MESSAGE_LEN; ++nuke)
+        for(; len < LINE_WIDTH; ++len)
         {
             tty_putstr(comm, 0, " ");
         }
@@ -4330,6 +4336,7 @@ void comm_activate(obj)
     struct obj *obj;
 {
     int i;
+    int y = 0;
     winid comm;
     const char *exit_error = NULL;
 
@@ -4343,6 +4350,7 @@ void comm_activate(obj)
 
     comm = create_nhwindow(NHW_COMM);
     tty_clear_nhwindow(comm);
+    tty_curs(comm, 2, 0);
 
     for(i = 0; i < (sizeof(device) / sizeof(device[0])); ++i)
     {
@@ -4426,6 +4434,10 @@ void comm_activate(obj)
             }
 
             tty_putstr(comm, g->attr, final);
+            if(NULL != strchr(final, '\n'))
+            {
+                tty_curs(comm, 0, ++y);
+            }
             term_end_color();
         }
     }

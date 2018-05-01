@@ -125,7 +125,7 @@ insert into objectives values(0, 'kill_blackdragon',		"Kill a Black Dragon",			1
 insert into objectives values(0, 'kill_mastermindflayer',	"Kill a Master Mind Flayer",	1500,	5, NOW());
 insert into objectives values(0, 'kill_archlich',			"Kill an Archlich",				1500,	5, NOW());
 insert into objectives values(0, 'kill_archon',				"Kill an Archon",				1500,	5, NOW());
-insert into objectives values(0, 'kill_oracle',				"Kill the evil Oracle",			5000,	10, NOW());
+insert into objectives values(0, 'kill_oracle',				"Kill the evil Oracle",			7500,	10, NOW());
 
 --
 -- Kill specials
@@ -181,35 +181,46 @@ insert into players values(0, "system", "", "prutt@korv.se", FALSE, null);
 -- Hackshit
 --
 insert into players values(0, "pellsson", md5("12"), "prutt@korv.se", FALSE, null);
-insert into players values(0, "breggan", md5("12"), "prutt@korv.se", FALSE, null);
+insert into players values(0, "aransentin", md5("12"), "prutt@korv.se", FALSE, null);
+insert into players values(0, "valen", md5("12"), "prutt@korv.se", FALSE, null);
+insert into players values(0, "balmer00", md5("bajskorv"), "prutt@korv.se", FALSE, null);
 
-insert into clans values(0, 1, 2, "Coola grabbarna", null);
+insert into clans values(0, 1, 2, "Pantbanken", null);
 insert into clan_members values(0, 1, 2, 'filled', null);
 insert into clan_members values(0, 1, 3, 'filled', null);
+insert into clan_members values(0, 1, 4, 'filled', null);
+insert into clan_members values(0, 1, 5, 'filled', null);
 
-insert into players values(0, "Najarana", md5("12"), "prutt@korv.se", FALSE, null);
+insert into players values(0, "breggan", md5("12"), "prutt@korv.se", FALSE, null);
 insert into players values(0, "gorbiz", md5("12"), "prutt@korv.se", FALSE, null);
 insert into players values(0, "bJazz", md5("12"), "prutt@korv.se", FALSE, null);
-insert into players values(0, "menvafan", md5("12"), "prutt@korv.se", FALSE, null);
-insert into players values(0, "CeleryMan", md5("12"), "prutt@korv.se", FALSE, null);
-insert into players values(0, "Herde", md5("12"), "prutt@korv.se", FALSE, null);
-insert into players values(0, "Erik2", md5("12"), "prutt@korv.se", FALSE, null);
-insert into players values(0, "wizard", md5("bajskorv"), "prutt@korv.se", FALSE, null);
+insert into players values(0, "balmer01", md5("bajskorv"), "prutt@korv.se", FALSE, null);
 
-insert into clans values(0, 1, 4, "BAJSCLAN", null);
-insert into clan_members values(0, 2, 4, 'filled', null);
-insert into clan_members values(0, 2, 5, 'filled', null);
+insert into clans values(0, 1, 2, "Nisses Lag", null);
 insert into clan_members values(0, 2, 6, 'filled', null);
 insert into clan_members values(0, 2, 7, 'filled', null);
 insert into clan_members values(0, 2, 8, 'filled', null);
 insert into clan_members values(0, 2, 9, 'filled', null);
-insert into clan_members values(0, 2, 10, 'filled', null);
-insert into clan_members values(0, 2, 11, 'filled', null);
 
+insert into clans values(0, 1, 4, "Ronald McDonald Trump", null);
+insert into players values(0, "Herde", md5("12"), "prutt@korv.se", FALSE, null);
+insert into players values(0, "Erik2", md5("12"), "prutt@korv.se", FALSE, null);
+insert into players values(0, "menvafan", md5("12"), "prutt@korv.se", FALSE, null);
+insert into players values(0, "CeleryMan", md5("12"), "prutt@korv.se", FALSE, null);
+insert into players values(0, "balmer02", md5("bajskorv"), "prutt@korv.se", FALSE, null);
+
+insert into clan_members values(0, 3, 10, 'filled', null);
+insert into clan_members values(0, 3, 11, 'filled', null);
+insert into clan_members values(0, 3, 12, 'filled', null);
+insert into clan_members values(0, 3, 13, 'filled', null);
+insert into clan_members values(0, 3, 14, 'filled', null);
+
+-- insert into players values(0, "Najarana", md5("12"), "prutt@korv.se", FALSE, null);
 
 insert into games values(0, "Test Tournament", NOW(), DATE_ADD(NOW(), INTERVAL 2000 HOUR), NOW());
 insert into game_participants values(0, 1, 1, NOW());
 insert into game_participants values(0, 1, 2, NOW());
+insert into game_participants values(0, 1, 3, NOW());
 
 drop database if exists nhtour_game_1;
 create database nhtour_game_1;

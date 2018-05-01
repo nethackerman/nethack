@@ -2032,6 +2032,15 @@ register struct monst *mtmp;
                 const struct kill_reward * const kr = &reward[i];
                 if(mtmp->data == &mons[kr->pm])
                 {
+                    if(PM_ORACLE == kr->pm)
+                    {
+                        struct obj *ticket = mksobj(SCR_GOLDEN_TICKET, TRUE, FALSE);
+                        bless(ticket);
+                        makeknown(ticket->otyp);
+                        place_object(ticket, mtmp->mx, mtmp->my);
+                        verbalize("Arruguhh! It can't be!? I've been defeated!");
+                    }
+
                     sql_complete_objective("kill", kr->reward);
                 }
             }
