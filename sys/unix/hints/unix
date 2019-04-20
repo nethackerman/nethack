@@ -23,13 +23,13 @@ WINSRC = $(WINTTYSRC)
 WINOBJ = $(WINTTYOBJ)
 WINLIB = $(WINTTYLIB)
 
-WINTTYLIB=-lncurses -lmysqlclient
+WINTTYLIB=-lncurses -lmariadbclient
 
 CHOWN=chown
 CHGRP=chgrp
 
 GAMEUID  = $(USER)
-GAMEGRP  = users # $(USER)
+GAMEGRP  = $(USER)
 
 GAMEPERM = 04755
 VARFILEPERM = 0644

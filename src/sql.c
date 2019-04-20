@@ -10,9 +10,9 @@
 #include "sql.h"
 
 #define SQL_SERVER		"127.0.0.1" // by ip, to force tcp sockets
-#define SQL_USER		"root"
-#define SQL_PASS		""
-#define SQL_DATABASE	"nhtour"
+#define SQL_USER		"nh"
+#define SQL_PASS		"nh12"
+#define SQL_DATABASE		"nhtour"
 
 static char game_database[128];
 static const char *active_db = SQL_DATABASE;
@@ -591,10 +591,10 @@ int sql_get_messages(struct chat_history *history, unsigned int offset, unsigned
 	}
 
 	if(NULL == (res = sql_query("select id, player_id, message, msg_type, unix_timestamp(messages.added) as added"
-		                        " from messages"
-		                        "   where clan_id=%d or msg_type<>0"
-		                        "   order by id desc limit %d, %d",
-		                        context.clan_id, offset, count)))
+					" from messages"
+					"   where clan_id=%d or msg_type<>0"
+					"   order by id desc limit %d, %d",
+					context.clan_id, offset, count)))
 	{
 		return 1;
 	}
@@ -643,7 +643,7 @@ static int get_unread(unsigned int msg_id, unsigned int *most_critical, unsigned
 	MYSQL_RES *res;
 	MYSQL_ROW row;
  
- 	res = sql_query("select count(*), ifnull(max(id), 0), ifnull(max(msg_type), 0) from messages"
+	res = sql_query("select count(*), ifnull(max(id), 0), ifnull(max(msg_type), 0) from messages"
 					" where (clan_id=%d or msg_type<>0) and id>%d", context.clan_id, msg_id);
 
 	if(NULL == res)
@@ -710,8 +710,8 @@ int sql_next_mail(char *from, char *message, int consume)
 	int rc = 1;
 
 	if(NULL == (res = sql_query("select id, from_name, body from nhtour.mails"
-		                        "    where to_player_id=%d and delivered=FALSE"
-		                        "    order by added asc limit 1", player_id)))
+					"    where to_player_id=%d and delivered=FALSE"
+					"    order by added asc limit 1", player_id)))
 	{
 		return 1;
 	}
