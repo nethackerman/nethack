@@ -1141,7 +1141,7 @@ int sql_sync_bag_content(struct obj *bag)
 	}
 
     bag->owt = weight(bag);
-    pline("Bag weight: %d", bag->owt);
+    // pline("Bag weight: %d", bag->owt);
 	mysql_free_result(res);
 	return 0;
 }

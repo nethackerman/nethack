@@ -2327,12 +2327,9 @@ register struct obj *obj;
         return -1;
 
     count = obj->quan;
-    pline("PRE Quan: %d, count: %d", obj->quan, count);
 
     if ((res = lift_object(obj, current_container, &count, FALSE)) <= 0)
         return res;
-
-    pline("Quan: %d, count: %d", obj->quan, count);
 
     if (obj->quan != count && obj->otyp != LOADSTONE)
         obj = splitobj(obj, count);
@@ -2853,7 +2850,7 @@ boolean put_in;
                     {
                         if(!sql_split_bag_item(otmp->dbid, count * -1))
                         {
-                            pline("SAD. FACE.");
+                            You("feel your team mates sticky fingers grab the item before you.");
                             continue;
                         }
                     }

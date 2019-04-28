@@ -420,8 +420,6 @@ long num;
     if (obj->cobj || num <= 0L || obj->quan <= num)
         panic("splitobj"); /* can't split containers */
 
-    pline("SPLIT DBG: %d, %d, %d", obj->ocontainer ? 1 : 0, obj->ocontainer ? obj->ocontainer->otyp : 0, obj->dbid);
-
     otmp = newobj();
     *otmp = *obj; /* copies whole structure */
     otmp->dbid = 0;
