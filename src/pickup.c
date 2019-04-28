@@ -2121,7 +2121,24 @@ register struct obj *obj;
     if (!current_container) {
         impossible("<in> no current_container?");
         return 0;
-    } else if (obj == uball || obj == uchain) {
+    }
+
+    if(PORTABLE_PORTAL == current_container->otyp)
+    {
+        if(Is_container(obj))
+        {
+            pline("%s resists.", The(xname(obj)));
+            return 0;
+        }
+
+        if(!wizard && obj->startgear)
+        {
+            You("couldn't possibly part with an item that reminds you of the outside world.");
+            return 0;
+        }
+    }
+
+    if (obj == uball || obj == uchain) {
         You("must be kidding.");
         return 0;
     } else if (obj == current_container) {
@@ -2139,7 +2156,8 @@ register struct obj *obj;
                || obj->otyp == CANDELABRUM_OF_INVOCATION
                || obj->otyp == BELL_OF_OPENING
                || obj->otyp == SPE_BOOK_OF_THE_DEAD
-               || obj->otyp == WRATH_OF_DEMOGORGON) {
+               || obj->otyp == WRATH_OF_DEMOGORGON
+               || obj->otyp == PORTABLE_PORTAL) {
         /* Prohibit Amulets in containers; if you allow it, monsters can't
          * steal them.  It also becomes a pain to check to see if someone
          * has the Amulet.  Ditto for the Candelabrum, the Bell and the Book.

@@ -1157,6 +1157,7 @@ int ochance, achance; /* percent chance for ordinary objects, artifacts */
         || obj->otyp == BELL_OF_OPENING
         || obj->otyp == WARPSTONE
         || obj->otyp == PAGER
+        || obj->otyp == PORTABLE_PORTAL
         || (obj->otyp == CORPSE && is_rider(&mons[obj->corpsenm]))) {
         return TRUE;
     } else {
@@ -1398,10 +1399,6 @@ int id;
     xchar ox, oy;
     boolean can_merge = (id == STRANGE_OBJECT);
     int obj_location = obj->where;
-
-    if(obj->otyp == PORTABLE_PORTAL) {
-        return obj;
-    }
 
     if (obj->otyp == BOULDER)
         sokoban_guilt();

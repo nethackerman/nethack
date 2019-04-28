@@ -50,6 +50,8 @@ register struct obj *otmp;
         return 20;
     case SCR_GENOCIDE:
         return 30;
+    case SCR_GOLDEN_TICKET:
+        return 2000;
     case SCR_BLANK_PAPER:
     default:
         impossible("You can't write such a weird scroll!");
