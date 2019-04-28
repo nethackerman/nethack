@@ -284,6 +284,8 @@ struct obj *box;
     case BAG_OF_HOLDING:
         n = 1;
         break;
+    case PORTABLE_PORTAL:
+        return;
     default:
         n = 0;
         break;
@@ -417,8 +419,12 @@ long num;
 
     if (obj->cobj || num <= 0L || obj->quan <= num)
         panic("splitobj"); /* can't split containers */
+
+    pline("SPLIT DBG: %d, %d, %d", obj->ocontainer ? 1 : 0, obj->ocontainer ? obj->ocontainer->otyp : 0, obj->dbid);
+
     otmp = newobj();
     *otmp = *obj; /* copies whole structure */
+    otmp->dbid = 0;
     otmp->oextra = (struct oextra *) 0;
     otmp->o_id = context.ident++;
     if (!otmp->o_id)
@@ -893,6 +899,7 @@ boolean artif;
             case SACK:
             case OILSKIN_SACK:
             case BAG_OF_HOLDING:
+            case PORTABLE_PORTAL:
                 mkbox_cnts(otmp);
                 break;
             case EXPENSIVE_CAMERA:
@@ -1248,7 +1255,7 @@ register struct obj *otmp;
     otmp->blessed = 1;
     if (carried(otmp) && confers_luck(otmp))
         set_moreluck();
-    else if (otmp->otyp == BAG_OF_HOLDING)
+    else if ((otmp->otyp == BAG_OF_HOLDING) || (otmp->otyp == PORTABLE_PORTAL))
         otmp->owt = weight(otmp);
     else if (otmp->otyp == FIGURINE && otmp->timed)
         (void) stop_timer(FIG_TRANSFORM, obj_to_any(otmp));
@@ -1268,7 +1275,7 @@ register struct obj *otmp;
     otmp->blessed = 0;
     if (carried(otmp) && confers_luck(otmp))
         set_moreluck();
-    else if (otmp->otyp == BAG_OF_HOLDING)
+    else if ((otmp->otyp == BAG_OF_HOLDING) || (otmp->otyp == PORTABLE_PORTAL))
         otmp->owt = weight(otmp);
     if (otmp->lamplit)
         maybe_adjust_light(otmp, old_light);
@@ -1298,7 +1305,7 @@ register struct obj *otmp;
     /* some cursed items need immediate updating */
     if (carried(otmp) && confers_luck(otmp)) {
         set_moreluck();
-    } else if (otmp->otyp == BAG_OF_HOLDING) {
+    } else if ((otmp->otyp == BAG_OF_HOLDING) || (otmp->otyp == PORTABLE_PORTAL)) {
         otmp->owt = weight(otmp);
     } else if (otmp->otyp == FIGURINE) {
         if (otmp->corpsenm != NON_PM && !dead_species(otmp->corpsenm, TRUE)
@@ -1325,7 +1332,7 @@ register struct obj *otmp;
     otmp->cursed = 0;
     if (carried(otmp) && confers_luck(otmp))
         set_moreluck();
-    else if (otmp->otyp == BAG_OF_HOLDING)
+    else if ((otmp->otyp == BAG_OF_HOLDING) || (otmp->otyp == PORTABLE_PORTAL))
         otmp->owt = weight(otmp);
     else if (otmp->otyp == FIGURINE && otmp->timed)
         (void) stop_timer(FIG_TRANSFORM, obj_to_any(otmp));
@@ -1387,8 +1394,9 @@ register struct obj *obj;
         if (obj->otyp == STATUE && obj->corpsenm >= LOW_PM)
             wt = (int) obj->quan * ((int) mons[obj->corpsenm].cwt * 3 / 2);
 
-        for (contents = obj->cobj; contents; contents = contents->nobj)
+        for (contents = obj->cobj; contents; contents = contents->nobj) {
             cwt += weight(contents);
+        }
         /*
          *  The weight of bags of holding is calculated as the weight
          *  of the bag plus the weight of the bag's contents modified
@@ -1403,7 +1411,7 @@ register struct obj *obj;
          *  The macro DELTA_CWT in pickup.c also implements these
          *  weight equations.
          */
-        if (obj->otyp == BAG_OF_HOLDING)
+        if ((obj->otyp == BAG_OF_HOLDING) || (obj->otyp == PORTABLE_PORTAL))
             cwt = obj->cursed ? (cwt * 2) : obj->blessed ? ((cwt + 3) / 4)
                                                          : ((cwt + 1) / 2);
 
@@ -1912,6 +1920,10 @@ struct obj *obj;
         remove_object(obj);
         break;
     case OBJ_CONTAINED:
+        if((obj->ocontainer->otyp == PORTABLE_PORTAL) && obj->dbid)
+        {
+            sql_remove_bag_item(obj);
+        }
         extract_nobj(obj, &obj->ocontainer->cobj);
         container_weight(obj->ocontainer);
         break;
@@ -2031,6 +2043,11 @@ struct obj *container, *obj;
     for (otmp = container->cobj; otmp; otmp = otmp->nobj)
         if (merged(&otmp, &obj))
             return otmp;
+
+    if(PORTABLE_PORTAL == container->otyp)
+    {
+        sql_add_bag_item(obj);
+    }
 
     obj->where = OBJ_CONTAINED;
     obj->ocontainer = container;

@@ -664,6 +664,7 @@ CONTAINER("DHL package",     None, 1, 0, 0,  0, 350,   8, WOOD, CLR_GREEN),
 CONTAINER("sack",           "bag", 0, 0, 0, 35,  15,   2, CLOTH, HI_CLOTH),
 CONTAINER("oilskin sack",   "bag", 0, 0, 0,  5,  15, 100, CLOTH, HI_CLOTH),
 CONTAINER("bag of holding", "bag", 0, 1, 0, 20,  15, 100, CLOTH, HI_CLOTH),
+CONTAINER("portable portal","bag", 1, 1, 0,  0,  15,   8, PLASTIC, CLR_ORANGE),
 CONTAINER("bag of tricks",  "bag", 0, 1, 1, 20,  15, 100, CLOTH, HI_CLOTH),
 #undef CONTAINER
 

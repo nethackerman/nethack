@@ -735,6 +735,7 @@ boolean by_hero;
          */
         || (container && (container->olocked || container_nesting > 2
                           || container->otyp == STATUE
+                          || container->otyp == PORTABLE_PORTAL
                           || (container->otyp == BAG_OF_HOLDING && rn2(40)))))
         return (struct monst *) 0;
 
@@ -1397,6 +1398,10 @@ int id;
     xchar ox, oy;
     boolean can_merge = (id == STRANGE_OBJECT);
     int obj_location = obj->where;
+
+    if(obj->otyp == PORTABLE_PORTAL) {
+        return obj;
+    }
 
     if (obj->otyp == BOULDER)
         sokoban_guilt();

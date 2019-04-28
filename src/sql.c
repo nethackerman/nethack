@@ -1026,3 +1026,202 @@ int sql_quest_completed(void)
 	return completed;
 }
 
+int sql_add_bag_item(struct obj *obj)
+{
+	MYSQL_RES *res;
+	char *esc_name = make_string(obj->oextra ? obj->oextra->oname : NULL);
+
+	res = sql_query("insert into sharedbag ("
+		"clan_id, otyp, quan, spe, "
+		"oclass, buc, oeroded, oeroded2, "
+		"oerodeproof, otrapped, recharged, greased, "
+		"corpsenm, usecount, oeaten, age, named) values("
+		"%d, %d, %d, %d, "
+		"%d, %d, %d, %d, "
+		"%d, %d, %d, %d, "
+		"%d, %d, %d, %d, "
+		"%s)",
+		we->clan_id, obj->otyp, obj->quan, obj->spe,
+		obj->oclass, (obj->cursed ? 0 : (obj->blessed ? 2 : 1)), obj->oeroded, obj->oeroded2,
+		obj->oerodeproof, obj->otrapped, obj->recharged, obj->greased,
+		obj->corpsenm, obj->usecount, obj->oeaten, obj->age,
+		esc_name);
+
+	obj->dbid = (int)mysql_insert_id(conn);
+	// pline("ID: %d", obj->dbid);
+
+	if(res)
+	{
+		mysql_free_result(res);
+	}
+
+	free(esc_name);	
+}
+
+#define next_col row[row_idx++]
+
+int sql_sync_bag_content(struct obj *bag)
+{
+	MYSQL_RES *res;
+	MYSQL_ROW row;
+
+	struct obj *otmp;
+
+	if(NULL == (res = sql_query("SELECT "
+		"id, otyp, quan, spe, "
+		"oclass, buc, oeroded, oeroded2, "
+		"oerodeproof, otrapped, recharged, greased, "
+		"corpsenm, usecount, oeaten, age, named FROM sharedbag where clan_id=%d and removed=0", we->clan_id)))
+	{
+		return -1;
+	}
+
+    while((otmp = bag->cobj) != 0) {
+    	otmp->dbid = 0;
+        obj_extract_self(otmp);
+        obfree(otmp, 0);
+    }
+
+	while(NULL != (row = mysql_fetch_row(res)))
+	{
+		int row_idx = 0;
+		int has_it = 0;
+		unsigned int dbid = atoi(next_col);
+
+		if(NULL == (otmp = mksobj(atoi(next_col), FALSE, FALSE)))
+		{
+			// Log this shit....
+			continue;
+		}
+		
+		otmp->dbid		= dbid;
+		otmp->quan		= atoi(next_col);
+		otmp->spe		= atoi(next_col);
+		otmp->oclass	= atoi(next_col);
+		
+		switch(atoi(next_col))
+		{
+			case 0:
+				curse(otmp);
+				break;
+			case 1:
+				uncurse(otmp);
+				unbless(otmp);
+				break;
+			case 2:
+			default:
+				bless(otmp);
+				break;
+		}
+
+		otmp->oeroded		= atoi(next_col);
+		otmp->oeroded2		= atoi(next_col);
+		otmp->oerodeproof	= atoi(next_col);
+		otmp->otrapped		= atoi(next_col);
+		otmp->recharged		= atoi(next_col);
+		otmp->greased		= atoi(next_col);
+		otmp->corpsenm		= atoi(next_col);
+		otmp->usecount		= atoi(next_col);
+		otmp->oeaten		= atoi(next_col);
+		otmp->age			= atoi(next_col);
+	
+		const char *name = next_col;
+
+		if(name)
+		{
+			oname(otmp, name);
+		}
+
+		otmp->owt = weight(otmp);
+
+		otmp->where = OBJ_CONTAINED;
+		otmp->ocontainer = bag;
+		otmp->nobj = bag->cobj;
+		bag->cobj = otmp;
+	}
+
+    bag->owt = weight(bag);
+    pline("Bag weight: %d", bag->owt);
+	mysql_free_result(res);
+	return 0;
+}
+
+int sql_remove_bag_item(struct obj *obj)
+{
+	int rc = 0;
+	MYSQL_RES *res;
+	MYSQL_ROW row;
+
+	sql_query("lock tables sharedbag");
+
+	res = sql_query("SELECT quan FROM sharedbag WHERE id=%d AND removed=0 LIMIT 1", obj->dbid);
+	
+	if(res)
+	{
+		if(NULL != (row = mysql_fetch_row(res)))
+		{
+			obj->quan = atoi(row[0]);
+
+			MYSQL_RES *kek = sql_query("UPDATE sharedbag SET removed=1 WHERE id=%d AND removed=0", obj->dbid);
+
+			if(kek)
+			{
+				mysql_free_result(kek);
+			}
+
+			rc = 1;
+		}
+		mysql_free_result(res);
+	}
+	
+	sql_query("unlock tables");
+	return rc;
+}
+
+int sql_split_bag_item(unsigned int dbid, int adjust)
+{
+	MYSQL_RES *res;
+	MYSQL_ROW row;
+	int rc = 0;
+
+	sql_query("lock tables sharedbag");
+
+	if(adjust < 0)
+	{
+		res = sql_query("SELECT quan FROM sharedbag WHERE id=%d AND clan_id=%d AND quan >= %d AND removed=0 LIMIT 1", dbid, we->clan_id, adjust * -1);	
+	}
+	else
+	{
+		res = sql_query("SELECT quan FROM sharedbag WHERE id=%d AND clan_id=%d AND removed=0 LIMIT 1", dbid, we->clan_id);	
+	}
+
+	if(res)
+	{
+		if(NULL != (row = mysql_fetch_row(res)))
+		{
+			int new_quan = atoi(row[0]) + adjust;
+			MYSQL_RES *kek;
+
+			if(new_quan <= 0) // cant be less?
+			{
+				kek = sql_query("UPDATE sharedbag SET removed=1 WHERE id=%d AND clan_id=%d", dbid, we->clan_id);
+			}
+			else
+			{
+				kek = sql_query("UPDATE sharedbag SET quan=%d WHERE id=%d AND clan_id=%d", new_quan, dbid, we->clan_id);	
+			}
+
+			if(kek)
+			{
+				mysql_free_result(kek);
+			}
+
+			rc = 1;
+		}
+
+		mysql_free_result(res);
+	}
+
+	sql_query("unlock tables");
+	return rc;
+}

@@ -1,0 +1,28 @@
+BUGS:
+- bag inside the portal
+- system shock
+- maybe more prop of itemloss on cancellation?
+- nuke'a portal i en BoH
+- must NOT wish portal
+- no put starting gear in portal
+- skriva golden ticket
+
+add_to_minv
+merged()
+
+
+-- DONE:
+
+// #tip
+
+// RELEVANT AFTER??????????
+update_inventory
+iflags.soko_prize_type1 = BAG_OF_HOLDING;
+use_container
+add_to_container(box, otmp);
+boh_loss(current_container, held)
+// THE SHIT IS THIS FUCKERY?
+in_container
+
+} else if (Is_mbag(current_container) && mbag_explodes(obj, 0)) {
+

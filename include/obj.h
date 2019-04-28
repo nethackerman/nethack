@@ -120,6 +120,7 @@ struct obj {
     long age;               /* creation date */
     long owornmask;
     char startgear;         /* set for your start gear */
+    int dbid;
     struct oextra *oextra; /* pointer to oextra struct */
 };
 
@@ -263,7 +264,7 @@ struct obj {
 #define Is_container(o) ((o)->otyp >= LARGE_BOX && (o)->otyp <= BAG_OF_TRICKS)
 #define Is_box(otmp) (otmp->otyp == LARGE_BOX || otmp->otyp == CHEST)
 #define Is_mbag(otmp) \
-    (otmp->otyp == BAG_OF_HOLDING || otmp->otyp == BAG_OF_TRICKS)
+    (otmp->otyp == BAG_OF_HOLDING || otmp->otyp == BAG_OF_TRICKS || otmp->otyp == PORTABLE_PORTAL)
 #define SchroedingersBox(o) ((o)->otyp == LARGE_BOX && (o)->spe == 1)
 
 /* dragon gear */

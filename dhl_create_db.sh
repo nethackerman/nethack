@@ -260,10 +260,30 @@ create table deliveries(
 	oeaten int,
 	age bigint,
 	named varchar(128),
-	delivered boolean,
-	to_player_id int,
-	from_player_id int,
 	added timestamp,
+	primary key(id));
+
+create table sharedbag(
+	id int not null auto_increment,
+	clan_id int,
+	otyp int,
+	quan int,
+	spe int,
+	oclass int,
+	buc int,
+	oeroded int,
+	oeroded2 int,
+	oerodeproof int,
+	otrapped int,
+	recharged int,
+	greased int,
+	corpsenm int,
+	usecount int,
+	oeaten int,
+	age bigint,
+	named varchar(128),
+	removed int default 0,
+	added timestamp default NOW(),
 	primary key(id));
 
 create table messages(

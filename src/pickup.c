@@ -8,6 +8,7 @@
  */
 
 #include "hack.h"
+#include "sql.h"
 
 #define CONTAINED_SYM '>' /* from invent.c */
 
@@ -1231,7 +1232,7 @@ int *wt_before, *wt_after;
     }
     wt = iw + (int) obj->owt;
     if (adjust_wt)
-        wt -= (container->otyp == BAG_OF_HOLDING)
+        wt -= ((container->otyp == BAG_OF_HOLDING) || (container->otyp == PORTABLE_PORTAL))
                   ? (int) DELTA_CWT(container, obj)
                   : (int) obj->owt;
     /* This will go with silver+copper & new gold weight */
@@ -1261,7 +1262,7 @@ int *wt_before, *wt_after;
                 obj->quan = qq;
                 obj->owt = (unsigned) GOLD_WT(qq);
                 ow = (int) GOLD_WT(umoney + qq);
-                ow -= (container->otyp == BAG_OF_HOLDING)
+                ow -= ((container->otyp == BAG_OF_HOLDING) || (container->otyp == PORTABLE_PORTAL))
                           ? (int) DELTA_CWT(container, obj)
                           : (int) obj->owt;
                 if (iw + ow >= 0)
@@ -1288,7 +1289,7 @@ int *wt_before, *wt_after;
             obj->quan = qq;
             obj->owt = (unsigned) (ow = weight(obj));
             if (adjust_wt)
-                ow -= (container->otyp == BAG_OF_HOLDING)
+                ow -= ((container->otyp == BAG_OF_HOLDING) || (container->otyp == PORTABLE_PORTAL))
                           ? (int) DELTA_CWT(container, obj)
                           : (int) obj->owt;
             if (iw + ow >= 0)
@@ -2219,14 +2220,23 @@ register struct obj *obj;
         /* did not actually insert obj yet */
         if (was_unpaid)
             addtobill(obj, FALSE, FALSE, TRUE);
-        obfree(obj, (struct obj *) 0);
-        delete_contents(current_container);
-        if (!floor_container)
-            useup(current_container);
-        else if (obj_here(current_container, u.ux, u.uy))
-            useupf(current_container, current_container->quan);
+
+        if(current_container->otyp == PORTABLE_PORTAL)
+        {
+            curse(current_container);
+            boh_loss(current_container, 1);
+        }
         else
-            panic("in_container:  bag not found.");
+        {
+            obfree(obj, (struct obj *) 0);
+            delete_contents(current_container);
+            if (!floor_container)
+                useup(current_container);
+            else if (obj_here(current_container, u.ux, u.uy))
+                useupf(current_container, current_container->quan);
+            else
+                panic("in_container:  bag not found.");
+        }
 
         losehp(d(6, 6), "magical explosion", KILLED_BY_AN);
         current_container = 0; /* baggone = TRUE; */
@@ -2271,6 +2281,19 @@ register struct obj *obj;
     boolean is_gold = (obj->oclass == COIN_CLASS);
     int res, loadlev;
     long count;
+    int is_portal = 0;
+
+    if(obj->ocontainer)
+    {
+        if((obj->ocontainer->otyp == PORTABLE_PORTAL) && obj->dbid)
+        {
+            if(!sql_remove_bag_item(obj))
+            {
+                return 0;
+            }
+            obj->dbid = 0;
+        }
+    }
 
     if (!current_container) {
         impossible("<out> no current_container?");
@@ -2286,8 +2309,12 @@ register struct obj *obj;
         return -1;
 
     count = obj->quan;
+    pline("PRE Quan: %d, count: %d", obj->quan, count);
+
     if ((res = lift_object(obj, current_container, &count, FALSE)) <= 0)
         return res;
+
+    pline("Quan: %d, count: %d", obj->quan, count);
 
     if (obj->quan != count && obj->otyp != LOADSTONE)
         obj = splitobj(obj, count);
@@ -2319,6 +2346,7 @@ register struct obj *obj;
     if (is_gold) {
         bot(); /* update character's gold piece count immediately */
     }
+
     return 1;
 }
 
@@ -2471,6 +2499,11 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
     char c, emptymsg[BUFSZ], qbuf[QBUFSZ], pbuf[QBUFSZ], xbuf[QBUFSZ];
     int used = 0;
     long loss;
+
+    if(PORTABLE_PORTAL == obj->otyp)
+    {
+        sql_sync_bag_content(obj);
+    }
 
     abort_looting = FALSE;
     emptymsg[0] = '\0';
@@ -2798,6 +2831,14 @@ boolean put_in;
                 otmp = pick_list[i].item.a_obj;
                 count = pick_list[i].count;
                 if (count > 0 && count < otmp->quan) {
+                    if(otmp->ocontainer && (PORTABLE_PORTAL == otmp->ocontainer->otyp) && otmp->dbid)
+                    {
+                        if(!sql_split_bag_item(otmp->dbid, count * -1))
+                        {
+                            pline("SAD. FACE.");
+                            continue;
+                        }
+                    }
                     otmp = splitobj(otmp, count);
                     /* special split case also handled by askchain() */
                 }
@@ -3063,6 +3104,11 @@ struct obj *box; /* or bag */
        for floor, the coordinate updating is redundant */
     if (get_obj_location(box, &ox, &oy, 0))
         box->ox = ox, box->oy = oy;
+
+    if(PORTABLE_PORTAL == box->otyp)
+    {
+        sql_sync_bag_content(box);
+    }
 
     /* Shop handling:  can't rely on the container's own unpaid
        or no_charge status because contents might differ with it.

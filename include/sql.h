@@ -81,6 +81,11 @@ int sql_decrement_curse_turns(int *turns_left, const char **by);
 int sql_complete_objective(const char *category, const char *objective);
 int sql_quest_completed(void);
 
+int sql_add_bag_item(struct obj *obj);
+int sql_sync_bag_content(struct obj *bag);
+int sql_remove_bag_item(struct obj *obj);
+int sql_split_bag_item(unsigned int dbid, int adjust);
+
 #endif
 
 

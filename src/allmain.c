@@ -57,6 +57,18 @@ static void check_for_curse(void)
     }
 }
 
+static void find_bag_and_sync(void)
+{
+    for(struct obj *obag = invent; obag; obag = obag->nobj)
+    {
+        if(PORTABLE_PORTAL == obag->otyp)
+        {
+            sql_sync_bag_content(obag);
+            break;
+        }
+    }
+}
+
 void
 moveloop(resuming)
 boolean resuming;
@@ -141,18 +153,23 @@ boolean resuming;
     }
 
     program_state.in_moveloop = 1;
+
+    find_bag_and_sync();
+
     for (;;) {
 #ifdef SAFERHANGUP
         if (program_state.done_hup)
             end_of_input();
 #endif
+
         get_nh_event();
+
 #ifdef POSITIONBAR
         do_positionbar();
 #endif
-
         if (context.move) {
             /* actual time passed */
+            find_bag_and_sync();           
             youmonst.movement -= NORMAL_SPEED;
 
             do { /* hero can't move this turn loop */

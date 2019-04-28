@@ -3668,6 +3668,7 @@ doapply()
     case BAG_OF_HOLDING:
     case OILSKIN_SACK:
     case DHL_PACKAGE:
+    case PORTABLE_PORTAL:
         res = use_container(&obj, 1, FALSE);
         break;
     case BAG_OF_TRICKS:
