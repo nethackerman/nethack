@@ -7,6 +7,8 @@
 #include "lev.h"
 #include "dlb.h"
 
+#include "sql.h"
+
 /*      [note: this comment is fairly old, but still accurate for 3.1]
  * Rumors have been entirely rewritten to speed up the access.  This is
  * essential when working from floppies.  Using fseek() the way that's done
@@ -474,6 +476,58 @@ boolean delphi;
     }
 }
 
+static int wait_keyboard(void)
+{
+    int rc;
+    struct timeval tv;
+    fd_set rdfs;
+
+    tv.tv_sec = 0;
+    tv.tv_usec = 100 * 1000;
+
+    FD_ZERO(&rdfs);
+    FD_SET(STDIN_FILENO, &rdfs);
+
+    rc = select(STDIN_FILENO + 1, &rdfs, NULL, NULL, &tv);
+    return (1 == rc) && FD_ISSET(STDIN_FILENO, &rdfs);
+ }
+
+static void offer_quest_item_and_wait(struct obj *obj)
+{
+    pline("Thank you noble warrior! As soon as your team mate hands me %s, I'll be strong enough to open the portal! Press 'q' to abort, but I'll keep the food.",
+        (YELLOW_ONION == obj->otyp) ? "some kebab" : "a yellow onion");
+
+    if(!sql_set_offering_item(obj->otyp))
+    {
+        pline("Oh my! Something is horribly horribly wrong!");
+        return;
+    }
+
+    delobj(obj);
+
+    for(;;)
+    {
+        if(sql_complete_offering())
+        {
+            break;
+        }
+        else if(wait_keyboard())
+        {
+            if('q' == getchar())
+            {
+                break;
+            }
+        }
+    }
+
+    if(sql_claim_quest_ticket())
+    {
+        pline("ENTER QUEST");
+    }
+
+    sql_remove_quest_offering();
+}
+
 int
 doconsult(oracl)
 struct monst *oracl;
@@ -481,7 +535,8 @@ struct monst *oracl;
     long umoney;
     int u_pay, minor_cost = 50, major_cost = 500 + 50 * u.ulevel;
     int add_xpts;
-    char qbuf[QBUFSZ];
+    char qbuf[256];
+    int offered = 0;
 
     multi = 0;
     umoney = money_cnt(invent);
@@ -490,13 +545,50 @@ struct monst *oracl;
         There("is no one here to consult.");
         return 0;
     } else if (!oracl->mpeaceful) {
-        pline("%s is in no mood for consultations.", Monnam(oracl));
-        return 0;
-    } else if (!umoney) {
-        You("have no money.");
+        pline("%s is in no mood for ḱebab.", Monnam(oracl));
         return 0;
     }
 
+    if(sql_claim_quest_ticket())
+    {
+        pline("ENTER QUEST");
+        return 0;
+    }
+
+    for(struct obj* obj = invent; obj; obj = obj->nobj) {
+        if((0 == (offered & 1)) && (obj->otyp == CORPSE && obj->corpsenm == PM_KEBABDJUR)) {
+            switch(ynq("Is that kebab I smell in your pocket? Would you mind giving it to me so I can open the portal and Den Fulleh Dansk can be stopped?"))
+            {
+                case 'q':
+                    return 0;
+                case 'n':
+                    break;
+                case 'y':
+                    offer_quest_item_and_wait(obj);
+                    return 0;
+            }
+            offered |= 0x01;
+        } else if((0 == (offered & 2)) && obj->otyp == YELLOW_ONION) {
+            switch(ynq("*Sniff sniff* Oh my! You carry a delicious yellow onion. Can I have it please?"))
+            {
+                case 'q':
+                    return 0;
+                case 'n':
+                    break;
+                case 'y':
+                    offer_quest_item_and_wait(obj);
+                    return 0;
+            }
+            offered |= 0x02;
+        }
+    }
+
+    if(0 == offered)
+    {
+        pline("Please brave warrior, I required your help to stop Den fulleh Dansk! Would you and your team mate find me some kebab and a yellow onion so I can gain strength to open the portal?");
+        return 0;
+    }
+#if 0
     Sprintf(qbuf, "\"Wilt thou settle for a minor consultation?\" (%d %s)",
             minor_cost, currency((long) minor_cost));
     switch (ynq(qbuf)) {
@@ -544,7 +636,10 @@ struct monst *oracl;
         more_experienced(add_xpts, u_pay / 50);
         newexplevel();
     }
+
     return 1;
+#endif
+    return 0;
 }
 
 /*rumors.c*/

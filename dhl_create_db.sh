@@ -263,8 +263,21 @@ create table deliveries(
 	added timestamp,
 	primary key(id));
 
+create table questoffer(
+	id int primary key auto_increment,
+	clan_id int,
+	otyp int,
+	CONSTRAINT offershit UNIQUE (clan_id, otyp)
+);
+
+create table questticket(
+	id int primary key auto_increment,
+	player_id int,
+	UNIQUE(player_id)
+);
+
 create table sharedbag(
-	id int not null auto_increment,
+	id int not primary key auto_increment,
 	clan_id int,
 	otyp int,
 	quan int,

@@ -1225,3 +1225,81 @@ int sql_split_bag_item(unsigned int dbid, int adjust)
 	sql_query("unlock tables");
 	return rc;
 }
+
+int sql_set_offering_item(int otyp)
+{
+	MYSQL_RES *r = sql_query("insert ignore into questoffer(clan_id, otyp) values(%d, %d)", we->clan_id, otyp);
+	if(r)
+	{
+		mysql_free_result(r);
+	}
+	return 1;
+}
+
+void sql_remove_quest_offering(void)
+{
+	MYSQL_RES *r = sql_query("delete from questoffer where clan_id=%d", we->clan_id);
+	if(r)
+	{
+		mysql_free_result(r);
+	}
+}
+
+static void insert_quest_tickets(void)
+{
+	int i;
+	for(i = 0; i < we->num_members; ++i)
+	{
+		MYSQL_RES *r = sql_query("insert ignore into questticket(player_id) values(%d)", we->members[i].player_id);
+
+		if(r)
+		{
+			mysql_free_result(r);
+		}
+	}
+
+	sql_remove_quest_offering();
+}
+
+int sql_complete_offering(void)
+{
+	MYSQL_RES *r = sql_query("select count(*) as cnt from questoffer where clan_id=%d", we->clan_id);
+
+	if(r)
+	{
+		MYSQL_ROW row;
+		if(NULL != (row = mysql_fetch_row(r)))
+		{
+			int num = atoi(row[0]);
+
+			if(0 == num)
+			{
+				return 1;
+			}
+
+			if(2 == num)
+			{
+				insert_quest_tickets();
+				return 1;
+			}
+		}
+		mysql_free_result(r);
+	}
+
+	return 0;
+}
+
+int sql_claim_quest_ticket(void)
+{
+	MYSQL_RES *r = sql_query("DELETE FROM questticket where player_id=%d", player_id);
+
+	int rc = mysql_affected_rows(conn) ? 1 : 0;
+
+	if(r)
+	{
+		mysql_free_result(r);
+	}
+
+	return rc;
+}
+

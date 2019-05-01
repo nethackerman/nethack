@@ -86,6 +86,11 @@ int sql_sync_bag_content(struct obj *bag);
 int sql_remove_bag_item(struct obj *obj);
 int sql_split_bag_item(unsigned int dbid, int adjust);
 
+int sql_set_offering_item(int otyp);
+void sql_remove_quest_offering(void);
+int sql_complete_offering(void);
+int sql_claim_quest_ticket(void);
+
 #endif
 
 
