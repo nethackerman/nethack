@@ -1965,7 +1965,7 @@ register struct monst *mtmp;
         u.uachieve.killed_medusa = 1;
     }
 
-    if(0 == numdead)
+    // if(0 == numdead)
     {
         static const struct kill_reward reward[] =
         {
