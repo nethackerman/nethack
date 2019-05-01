@@ -779,6 +779,7 @@ FOOD("melon",                10,  1,  5, 0, VEGGY, 100, CLR_BRIGHT_GREEN),
 FOOD("banana",               10,  1,  2, 0, VEGGY,  80, CLR_YELLOW),
 FOOD("carrot",               15,  1,  2, 0, VEGGY,  50, CLR_ORANGE),
 FOOD("sprig of wolfsbane",    7,  1,  1, 0, VEGGY,  40, CLR_GREEN),
+FOOD("yellow onion",          0,  1,  1, 0, VEGGY,  40, CLR_YELLOW),
 FOOD("clove of garlic",       7,  1,  1, 0, VEGGY,  40, CLR_WHITE),
 /* name of slime mold is changed based on player's OPTION=fruit:something
    and bones data might have differently named ones from prior games */
@@ -1155,10 +1156,13 @@ OBJECT(OBJ("iron chain", None),
  */
 OBJECT(OBJ("blinding venom", "splash of venom"),
        BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, LIQUID), 0,
-       VENOM_CLASS, 500, 0, 1, 0, 0, 0, 0, 0, 0, HI_ORGANIC),
+       VENOM_CLASS, 333, 0, 1, 0, 0, 0, 0, 0, 0, HI_ORGANIC),
 OBJECT(OBJ("acid venom", "splash of venom"),
        BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, LIQUID), 0,
-       VENOM_CLASS, 500, 0, 1, 0, 6, 6, 0, 0, 0, HI_ORGANIC),
+       VENOM_CLASS, 333, 0, 1, 0, 6, 6, 0, 0, 0, HI_ORGANIC),
+OBJECT(OBJ("strong sauce", "splash of strong sauce"),
+       BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, LIQUID), 0,
+       VENOM_CLASS, 334, 0, 1, 0, 6, 6, 0, 0, 0, HI_ORGANIC),
         /* +d6 small or large */
 
 /* fencepost, the deadly Array Terminator -- name [1st arg] *must* be NULL */

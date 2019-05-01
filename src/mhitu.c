@@ -1097,6 +1097,7 @@ register struct attack *mattk;
                 You("are put to sleep by %s!", mon_nam(mtmp));
         }
         break;
+    case AD_SAUS:
     case AD_BLND:
         if (can_blnd(mtmp, &youmonst, mattk->aatyp, (struct obj *) 0)) {
             if (!Blind)
@@ -1879,6 +1880,7 @@ struct attack *mattk;
             exercise(A_STR, FALSE);
         }
         break;
+    case AD_SAUS:
     case AD_BLND:
         if (can_blnd(mtmp, &youmonst, mattk->aatyp, (struct obj *) 0)) {
             if (!Blind) {

@@ -1097,6 +1097,9 @@ dospit()
         impossible("bad spit attack?");
     } else {
         switch (mattk->adtyp) {
+        case AD_SAUS:
+            otmp = mksobj(STRONG_SAUCE, TRUE, FALSE);
+            break;
         case AD_BLND:
         case AD_DRST:
             otmp = mksobj(BLINDING_VENOM, TRUE, FALSE);

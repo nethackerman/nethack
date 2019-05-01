@@ -424,7 +424,7 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
            that the target is still alive anyway */
         if (mtmp->mhp > 0
             && can_blnd((struct monst *) 0, mtmp,
-                        (uchar) ((otmp->otyp == BLINDING_VENOM) ? AT_SPIT
+                        (uchar) (((otmp->otyp == BLINDING_VENOM) || (otmp->otyp == STRONG_SAUCE)) ? AT_SPIT
                                                                 : AT_WEAP),
                         otmp)) {
             if (vis && mtmp->mcansee)
@@ -582,6 +582,7 @@ struct obj *obj;         /* missile (or stack providing it) */
             /* fall through */
             case CREAM_PIE:
             case BLINDING_VENOM:
+            case STRONG_SAUCE:
                 hitu = thitu(8, 0, &singleobj, (char *) 0);
                 break;
             default:
@@ -615,7 +616,7 @@ struct obj *obj;         /* missile (or stack providing it) */
                          (u.umortality > oldumort) ? 0 : 10, TRUE);
             }
             if (hitu && can_blnd((struct monst *) 0, &youmonst,
-                                 (uchar) ((singleobj->otyp == BLINDING_VENOM)
+                                 (uchar)(((singleobj->otyp == BLINDING_VENOM) || (singleobj->otyp == STRONG_SAUCE))
                                              ? AT_SPIT
                                              : AT_WEAP),
                                  singleobj)) {
@@ -626,14 +627,14 @@ struct obj *obj;         /* missile (or stack providing it) */
                     else
                         pline("There's %s sticky all over your %s.",
                               something, body_part(FACE));
-                } else if (singleobj->otyp == BLINDING_VENOM) {
+                } else if (singleobj->otyp == BLINDING_VENOM || singleobj->otyp == STRONG_SAUCE) {
                     const char *eyes = body_part(EYE);
 
                     if (eyecount(youmonst.data) != 1)
                         eyes = makeplural(eyes);
                     /* venom in the eyes */
                     if (!Blind)
-                        pline_The("venom blinds you.");
+                        pline_The((singleobj->otyp == STRONG_SAUCE) ? "strong sauce blinds you." : "venom blinds you.");
                     else
                         Your("%s %s.", eyes, vtense(eyes, "sting"));
                 }
@@ -745,6 +746,9 @@ struct attack *mattk;
     }
     if (m_lined_up(mtarg, mtmp)) {
         switch (mattk->adtyp) {
+        case AD_SAUS:
+            otmp = mksobj(STRONG_SAUCE, TRUE, FALSE);
+            break;
         case AD_BLND:
         case AD_DRST:
             otmp = mksobj(BLINDING_VENOM, TRUE, FALSE);
@@ -758,7 +762,7 @@ struct attack *mattk;
         }
         if (!rn2(BOLT_LIM-distmin(mtmp->mx,mtmp->my,mtarg->mx,mtarg->my))) {
             if (canseemon(mtmp))
-                pline("%s spits venom!", Monnam(mtmp));
+                pline("%s spits %s!", Monnam(mtmp), (mattk->adtyp == AD_SAUS) ? "strong sauce" : "venom");
             target = mtarg;
             m_throw(mtmp, mtmp->mx, mtmp->my, sgn(tbx), sgn(tby),
                     distmin(mtmp->mx,mtmp->my,mtarg->mx,mtarg->my), otmp);
@@ -946,6 +950,9 @@ struct attack *mattk;
     }
     if (lined_up(mtmp)) {
         switch (mattk->adtyp) {
+        case AD_SAUS:
+            otmp = mksobj(STRONG_SAUCE, TRUE, FALSE);
+            break;
         case AD_BLND:
         case AD_DRST:
             otmp = mksobj(BLINDING_VENOM, TRUE, FALSE);
@@ -960,7 +967,7 @@ struct attack *mattk;
         if (!rn2(BOLT_LIM
                  - distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy))) {
             if (canseemon(mtmp))
-                pline("%s spits venom!", Monnam(mtmp));
+                pline("%s spits %s!", Monnam(mtmp), AD_SAUS == mattk->adtyp ? "strong sauce" : "venom");
             m_throw(mtmp, mtmp->mx, mtmp->my, sgn(tbx), sgn(tby),
                     distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy), otmp);
             nomul(0);

@@ -217,7 +217,7 @@ struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
         if (obj && (obj->otyp == CREAM_PIE)) {
             if (is_you && Blindfolded)
                 return FALSE;
-        } else if (obj && (obj->otyp == BLINDING_VENOM)) {
+        } else if (obj && ((obj->otyp == BLINDING_VENOM) || (obj->otyp == STRONG_SAUCE))) {
             /* all ublindf, including LENSES, protect, cream-pies too */
             if (is_you && (ublindf || u.ucreamed))
                 return FALSE;

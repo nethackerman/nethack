@@ -408,6 +408,11 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     boolean pluralize = (obj->quan != 1L) && !(cxn_flags & CXN_SINGULAR);
     boolean known, dknown, bknown;
 
+    if(STRONG_SAUCE == typ)
+    {
+        dn = "splash of strong sauce";
+    }
+
     buf = nextobuf() + PREFIX; /* leave room for "17 -3 " */
     if (Role_if(PM_SAMURAI) && Japanese_item_name(typ))
         actualn = Japanese_item_name(typ);

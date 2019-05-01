@@ -1144,6 +1144,7 @@ register struct attack *mattk;
             mdef->mstrategy &= ~STRAT_WAITFORU;
         }
         break;
+    case AD_SAUS:
     case AD_BLND:
         if (can_blnd(magr, mdef, mattk->aatyp, (struct obj *) 0)) {
             register unsigned rnd_tmp;

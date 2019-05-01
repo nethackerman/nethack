@@ -1159,7 +1159,7 @@ struct obj *body;
 #define ROT_AGE (250L)         /* age when corpses rot away */
 
     /* lizards and lichen don't rot or revive */
-    if (body->corpsenm == PM_LIZARD || body->corpsenm == PM_LICHEN)
+    if (body->corpsenm == PM_LIZARD || body->corpsenm == PM_LICHEN || body->corpsenm == PM_KEBABDJUR)
         return;
 
     action = ROT_CORPSE;             /* default action: rot away */
@@ -1434,7 +1434,7 @@ register struct obj *obj;
     return (wt ? wt * (int) obj->quan : ((int) obj->quan + 1) >> 1);
 }
 
-static int treefruits[] = { APPLE, ORANGE, PEAR, BANANA, EUCALYPTUS_LEAF };
+static int treefruits[] = { YELLOW_ONION /* APPLE, ORANGE, PEAR, BANANA, EUCALYPTUS_LEAF */ };
 
 struct obj *
 rnd_treefruit_at(x, y)
@@ -1466,7 +1466,7 @@ int x, y;
 
 /* return TRUE if the corpse has special timing */
 #define special_corpse(num)                                                 \
-    (((num) == PM_LIZARD) || ((num) == PM_LICHEN) || (is_rider(&mons[num])) \
+    (((num) == PM_LIZARD) || ((num) == PM_KEBABDJUR) || ((num) == PM_LICHEN) || (is_rider(&mons[num])) \
      || (mons[num].mlet == S_TROLL))
 
 /*

@@ -966,9 +966,10 @@ int dieroll;
                     break;
                 case CREAM_PIE:
                 case BLINDING_VENOM:
+                case STRONG_SAUCE:
                     mon->msleeping = 0;
                     if (can_blnd(&youmonst, mon,
-                                 (uchar) (obj->otyp == BLINDING_VENOM
+                                 (uchar)(((obj->otyp == BLINDING_VENOM) || (obj->otyp == STRONG_SAUCE))
                                              ? AT_SPIT
                                              : AT_WEAP),
                                  obj)) {
@@ -977,6 +978,9 @@ int dieroll;
                                                          : "Splash!");
                         } else if (obj->otyp == BLINDING_VENOM) {
                             pline_The("venom blinds %s%s!", mon_nam(mon),
+                                      mon->mcansee ? "" : " further");
+                        } else if (obj->otyp == STRONG_SAUCE) {
+                            pline_The("strong sauce blinds %s%s!", mon_nam(mon),
                                       mon->mcansee ? "" : " further");
                         } else {
                             char *whom = mon_nam(mon);
