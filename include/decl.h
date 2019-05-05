@@ -70,10 +70,16 @@ E struct dgn_topology { /* special dungeon levels for speed */
     d_level d_knox_level;
     d_level d_mineend_level;
     d_level d_sokoend_level;
+    d_level d_vinst1_level;
+    d_level d_vinst2_level;
+    d_level d_vinst3_level;
 } dungeon_topology;
 /* macros for accessing the dungeon levels by their old names */
 /* clang-format off */
 #define oracle_level            (dungeon_topology.d_oracle_level)
+#define vinst1_level        (dungeon_topology.d_vinst1_level)
+#define vinst2_level        (dungeon_topology.d_vinst2_level)
+#define vinst3_level        (dungeon_topology.d_vinst3_level)
 #define bigroom_level           (dungeon_topology.d_bigroom_level)
 #define rogue_level             (dungeon_topology.d_rogue_level)
 #define medusa_level            (dungeon_topology.d_medusa_level)

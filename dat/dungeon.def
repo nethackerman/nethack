@@ -21,6 +21,7 @@ LEVEL:		"rogue" "R" @ (15, 4)
 LEVELDESC:	roguelike
 LEVEL:		"oracle" "O" @ (5, 5)
 LEVALIGN:	neutral
+CHAINBRANCH: "vinstquest" "oracle" + (0, 0) no_down
 CHAINBRANCH:	"Sokoban" "oracle" + (1, 0) up
 RNDLEVEL:	"bigrm" "B" @ (10, 3) 40 10
 CHAINBRANCH:	"The Quest" "oracle" + (6, 2) portal
@@ -87,6 +88,16 @@ DUNGEON:	"The Quest" "Q" (5, 2)
 LEVEL:	"x-strt" "none" @ (1, 1)
 LEVEL:	"x-loca" "L" @ (3, 1)
 LEVEL:	"x-goal" "none" @ (-1, 0)
+
+#
+# Vinstquest
+#
+DUNGEON:		"vinstquest" "none" (3, 0)
+ALIGNMENT:      neutral
+#ENTRY:          -1
+LEVEL:		"vinst1" "none" @ (1, 0)
+LEVEL:		"vinst2" "none" @ (2, 0)
+LEVEL:		"vinst3" "none" @ (3, 0)
 
 #
 # Sokoban

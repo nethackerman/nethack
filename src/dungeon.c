@@ -706,6 +706,9 @@ struct level_map {
                   { X_START, &qstart_level },
                   { X_LOCATE, &qlocate_level },
                   { X_GOAL, &nemesis_level },
+                  { "vinst1", &vinst1_level },
+                  { "vinst2", &vinst2_level },
+                  { "vinst3", &vinst3_level },
                   { "", (d_level *) 0 } };
 
 /* initialize the "dungeon" structs */

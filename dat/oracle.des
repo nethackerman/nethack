@@ -31,6 +31,7 @@ ROOM: "ordinary" , lit, (3,3), (center,center), (11,9) {
 
 }
 
+
 ROOM: "ordinary" , random, random, random, random {
   STAIR: random, up
   OBJECT: random,random
@@ -63,3 +64,7 @@ ROOM: "ordinary" , random, random, random, random {
 }
 
 RANDOM_CORRIDORS
+
+# TELEPORT_REGION:(0,0,25,19),(0,0,0,0)
+# PORTAL:(51,0,75,19),(0,0,0,0),"astral"
+PORTAL: levregion(40, 11, 40, 11),(0,0,0,0),"vinst1"

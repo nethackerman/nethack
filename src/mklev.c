@@ -1170,9 +1170,10 @@ xchar x, y; /* location */
             (char) on_level(&br->end1, &u.uz) ? br->end1_up : !br->end1_up;
         assign_level(&sstairs.tolev, dest);
         sstairs_room = br_room;
-
-        levl[x][y].ladder = sstairs.up ? LA_UP : LA_DOWN;
-        levl[x][y].typ = STAIRS;
+        if(!Is_vinst1_level(&u.uz)) {
+            levl[x][y].ladder = sstairs.up ? LA_UP : LA_DOWN;
+            levl[x][y].typ = STAIRS;
+        }
     }
     /*
      * Set made_branch to TRUE even if we didn't make a stairwell (i.e.
@@ -1511,7 +1512,6 @@ struct mkroom *croom;
         impossible("mkstairs:  bogus stair attempt at <%d,%d>", x, y);
         return;
     }
-
     /*
      * We can't make a regular stair off an end of the dungeon.  This
      * attempt can happen when a special level is placed at an end and
