@@ -1294,6 +1294,7 @@ int sql_claim_quest_ticket(void)
 	MYSQL_RES *r = sql_query("DELETE FROM questticket where player_id=%d", player_id);
 
 	int rc = mysql_affected_rows(conn) ? 1 : 0;
+	//pline("Affected %d", rc);
 
 	if(r)
 	{

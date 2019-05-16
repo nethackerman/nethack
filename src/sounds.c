@@ -491,6 +491,7 @@ STATIC_OVL int
 domonnoise(mtmp)
 register struct monst *mtmp;
 {
+    char answer[BUFSZ];
     char verbuf[BUFSZ];
     register const char *pline_msg = 0, /* Monnam(mtmp) will be prepended */
         *verbl_msg = 0,                 /* verbalize() */
@@ -526,6 +527,19 @@ register struct monst *mtmp;
         map_invisible(mtmp->mx, mtmp->my);
 
     switch (msound) {
+    case MS_QUIZ:
+        if(!Is_vinst2_level(&u.uz)) {
+            verbalize("This is not the quest you are looking for");
+            return;
+        }
+        if(mtmp->mx == 15 && mtmp->my == 8) {
+            verbalize("I am number 1");
+            getlin("Shoe size?", answer);
+        }
+        else {
+            verbalize("Wat? I am stood on %d, %d. This is not my home.", mtmp->mx, mtmp->my);
+        }
+        return;
     case MS_ORACLE:
         return doconsult(mtmp);
     case MS_PRIEST:

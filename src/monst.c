@@ -1040,6 +1040,17 @@ NEARDATA struct permonst mons[] = {
         M2_NOPOLY | M2_MINION | M2_STALK | M2_STRONG | M2_NASTY | M2_LORD
             | M2_COLLECT | M2_MAGIC,
         M3_INFRAVISIBLE | M3_INFRAVISION, HI_LORD),
+    MON("Quiz Angel", S_ANGEL, LVL(30, 0, -120, 80, 15),
+        (G_NOHELL | G_NOCORPSE | G_NOGEN),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_WEAP, AD_PHYS, 2, 4),
+          ATTK(AT_GAZE, AD_BLND, 2, 6), ATTK(AT_CLAW, AD_PHYS, 1, 8),
+          ATTK(AT_MAGC, AD_SPEL, 4, 6), NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_QUIZ, MZ_LARGE),
+        MR_FIRE | MR_COLD | MR_ELEC | MR_SLEEP | MR_POISON, 0,
+        M1_FLY | M1_HUMANOID | M1_SEE_INVIS | M1_REGEN,
+        M2_NOPOLY | M2_MINION | M2_STRONG | M2_LORD
+            | M2_COLLECT | M2_MAGIC,
+        M3_INFRAVISIBLE | M3_INFRAVISION, CLR_RED),
     /*
      * Bats
      */

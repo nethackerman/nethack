@@ -492,6 +492,25 @@ static int wait_keyboard(void)
     return (1 == rc) && FD_ISSET(STDIN_FILENO, &rdfs);
  }
 
+/* really free dead monsters */
+static void
+kebaboracle()
+{
+    struct monst **mtmp, *freetmp;
+
+    for (mtmp = &fmon; *mtmp;) {
+        freetmp = *mtmp;
+        if (freetmp->data == &mons[PM_ORACLE]) {
+            freetmp->data = &mons[PM_KEBABDJUR];
+            doredraw();
+            return;
+        } else
+            mtmp = &(freetmp->nmon);
+    }
+
+    impossible("No oracle!");
+}
+
 static void offer_quest_item_and_wait(struct obj *obj)
 {
     pline("Thank you noble warrior! As soon as your team mate hands me %s, I'll be strong enough to open the portal! Press 'q' to abort, but I'll keep the food.",
@@ -522,7 +541,8 @@ static void offer_quest_item_and_wait(struct obj *obj)
 
     if(sql_claim_quest_ticket())
     {
-        pline("ENTER QUEST");
+        verbalize("My people need me!");        
+        kebaboracle();
     }
 
     sql_remove_quest_offering();
@@ -551,7 +571,8 @@ struct monst *oracl;
 
     if(sql_claim_quest_ticket())
     {
-        pline("ENTER QUEST");
+        verbalize("My people need me!");        
+        kebaboracle();
         return 0;
     }
 
