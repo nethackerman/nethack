@@ -325,6 +325,24 @@ create table score(
 	added timestamp,
 	primary key(id));
 
+create table questions(
+	id int not null auto_increment,
+	q varchar(256) not null,
+	a varchar(256) not null,
+	primary key(id)
+);
+
+insert into questions (q,a) values("fisk?", "ja");
+insert into questions (q,a) values("fisk?", "ja");
+insert into questions (q,a) values("fisk?", "ja");
+insert into questions (q,a) values("fisk?", "ja");
+insert into questions (q,a) values("fisk?", "ja");
+insert into questions (q,a) values("fisk?", "ja");
+insert into questions (q,a) values("fisk?", "ja");
+insert into questions (q,a) values("fisk?", "ja");
+insert into questions (q,a) values("fisk?", "ja");
+insert into questions (q,a) values("fisk?", "ja");
+
 --
 -- Hack shit
 --

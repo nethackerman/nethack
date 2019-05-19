@@ -1377,8 +1377,13 @@ boolean give_feedback;
         unstuck(mtmp);
         (void) rloc(mtmp, TRUE);
     } else if (is_rider(mtmp->data) && rn2(13)
-               && enexto(&cc, u.ux, u.uy, mtmp->data))
+               && enexto(&cc, u.ux, u.uy, mtmp->data)) {
         rloc_to(mtmp, cc.x, cc.y);
+    } else if(mtmp->data == &mons[PM_ORACLE] || mtmp->data == &mons[PM_QUIZ_ANGEL]) {
+        if(give_feedback)
+            pline("%s resists your magic!", Monnam(mtmp));
+        return FALSE;
+    }
     else
         (void) rloc(mtmp, TRUE);
     return TRUE;

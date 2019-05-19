@@ -904,7 +904,9 @@ const char *s;
     }
     for (x = rn2(3); x; x--) {
         mazexy(&mm);
+        if(!Is_vinst3_level(&u.uz)) {
         (void) makemon(&mons[PM_MINOTAUR], mm.x, mm.y, NO_MM_FLAGS);
+        }
     }
     for (x = rn1(5, 7); x; x--) {
         mazexy(&mm);

@@ -91,6 +91,8 @@ void sql_remove_quest_offering(void);
 int sql_complete_offering(void);
 int sql_claim_quest_ticket(void);
 
+int sql_get_question(int id, char *q, char *a);
+
 #endif
 
 

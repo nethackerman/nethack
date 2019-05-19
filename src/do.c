@@ -1124,6 +1124,23 @@ register xchar x, y;
 }
 */
 
+void disclose_smell(void)
+{
+    int x;
+    int y;
+    for(x = 0; x < 80; ++x)
+    {
+        for(y = 0; y < 20; ++y)
+        {
+            if(levl[x][y].typ == TREE)
+            {
+                pline("The yellow onion trees smell delicious today!");
+                return;
+            }
+        }
+    }
+}
+
 void
 goto_level(newlevel, at_stairs, falling, portal)
 d_level *newlevel;
@@ -1141,6 +1158,7 @@ boolean at_stairs, falling, portal;
     struct monst *mtmp;
     char whynot[BUFSZ];
     char *annotation;
+
 
     if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
         newlevel->dlevel = dunlevs_in_dungeon(newlevel);
@@ -1583,7 +1601,9 @@ boolean at_stairs, falling, portal;
     context.polearm.hitmon = (struct monst *) 0; /* polearm target */
     /* digging context is level-aware and can actually be resumed if
        hero returns to the previous level without any intervening dig */
+    disclose_smell();
 }
+
 
 STATIC_OVL void
 final_level()

@@ -1304,3 +1304,22 @@ int sql_claim_quest_ticket(void)
 	return rc;
 }
 
+int sql_get_question(int id, char *q, char *a) {
+	int rc = 0;
+	MYSQL_RES *r = sql_query("select q,a from questions where id=%d", id);
+
+	if(r)
+	{
+		MYSQL_ROW row;
+		if(NULL != (row = mysql_fetch_row(r)))
+		{
+			strcpy(q, row[0]);
+			strcpy(a, row[1]);
+			rc = 1;
+		}
+		mysql_free_result(r);
+	}
+
+	return rc;
+}
+

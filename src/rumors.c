@@ -501,7 +501,9 @@ kebaboracle()
     for (mtmp = &fmon; *mtmp;) {
         freetmp = *mtmp;
         if (freetmp->data == &mons[PM_ORACLE]) {
-            freetmp->data = &mons[PM_KEBABDJUR];
+            //++freetmp->mx;
+            freetmp->mhp = 0;
+            mongone(freetmp);
             doredraw();
             return;
         } else

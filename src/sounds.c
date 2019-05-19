@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "sql.h"
 
 STATIC_DCL boolean FDECL(mon_is_gecko, (struct monst *));
 STATIC_DCL int FDECL(domonnoise, (struct monst *));
@@ -487,6 +488,63 @@ struct monst *mon;
     return (boolean) (glyph_to_mon(glyph) == PM_GECKO);
 }
 
+static int get_question(const struct monst *mtmp, char *q, char *a) 
+{
+    int id = 0;
+    if(mtmp->my == 8) {
+        switch(mtmp->mx) {
+            case 26: id = 1; break;
+            case 37: id = 2; break;
+            case 48: id = 3; break;
+            case 59: id = 4; break;
+        }
+
+    } else if(mtmp->my == 15) {
+        switch(mtmp->mx) {
+            case 54: id = 5; break;
+            case 43: id = 6; break;
+            case 32: id = 7; break;
+            case 21: id = 8; break;
+        }
+    }
+
+    if(0 == id) {
+        return 0;
+    }
+
+    if(sql_get_question(id, q, a)) {
+        return id;
+    }
+    return 0;
+}
+
+static void question_fail(const struct monst *mtmp, int id) {
+    int x = mtmp->mx;
+    int y = mtmp->my;
+    x += (y == 15) ? -4 : 2;
+
+    static const int monid[] = {
+        PM_ARCHON,
+        PM_GRID_BUG, PM_JACKAL, PM_KEYSTONE_KOP, PM_ORC_ZOMBIE,
+        PM_ROTHE, PM_MORDOR_ORC, PM_WATER_NYMPH, PM_RAVEN, PM_SOLDIER_ANT,
+        // Not used.
+        PM_GRID_BUG, PM_GRID_BUG, PM_GRID_BUG, PM_GRID_BUG,
+    };
+
+    for(int i = 0; i < 3; ++i)
+    {
+        for(int j = 0; j < 3; ++j)
+        {
+            struct monst * const m = makemon(&mons[monid[id]], x + i, y + j - 1, NO_MM_FLAGS);
+            if(m)
+            {
+                m->mtame     = 0;
+                m->mpeaceful = 0;
+            }
+        }
+    }
+}
+
 STATIC_OVL int
 domonnoise(mtmp)
 register struct monst *mtmp;
@@ -528,18 +586,35 @@ register struct monst *mtmp;
 
     switch (msound) {
     case MS_QUIZ:
+    {
+        int id;
+        static char q[260];
+        static char a[260];
         if(!Is_vinst2_level(&u.uz)) {
             verbalize("This is not the quest you are looking for");
-            return;
+            return 1;
         }
-        if(mtmp->mx == 15 && mtmp->my == 8) {
-            verbalize("I am number 1");
-            getlin("Shoe size?", answer);
+
+        id = get_question(mtmp, q, a);
+
+        if(id) {
+            getlin(q, answer);
+            if(0 == strcasecmp(a, answer)) {
+                verbalize("Thou hast proven thyself worthy. You may pass!");
+                more();
+            } else {
+                verbalize("Thy ignorance shall not go unpunished!");
+                more();
+                question_fail(mtmp, id);
+            }
         }
         else {
             verbalize("Wat? I am stood on %d, %d. This is not my home.", mtmp->mx, mtmp->my);
         }
-        return;
+        mtmp->mhp = 0;
+        mongone(mtmp);
+    }
+    return 1;
     case MS_ORACLE:
         return doconsult(mtmp);
     case MS_PRIEST:
