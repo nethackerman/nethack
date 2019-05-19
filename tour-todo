@@ -1,3 +1,20 @@
+TODO 2019:
+- Gör klart question
+- Award points
+
+
+TODO 2019 DONE (UNTESTED):
+- No branchport till question
+- Empty answer on question does nothing
+- Disable level tele on quest
+- Test c!oGL (Fine, den går åt andra hållet, man åker bara mot 1 och sen ut)
+- Spawn dansk where people exists == segfault :)
+- Remove warpstone (removed from starting inventory)
+- Remove wrath of demo (and donation incentive hackery) (donation impossible)
+- Fix golden ticket (Good enough)
+
+
+
 TODO v2:
 - Fix constants SQL_blah. move to database.
 

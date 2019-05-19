@@ -87,6 +87,9 @@ insert into objectives values(0, 'reach_air',		"Reach Air Plane",		1000, 5, NOW(
 insert into objectives values(0, 'reach_fire',		"Reach Fire Plane",		1000, 5, NOW());
 insert into objectives values(0, 'reach_water',		"Reach Water Plane",	1000, 5, NOW());
 insert into objectives values(0, 'reach_astral',	"Reach Astral Plane",	1000, 5, NOW());
+insert into objectives values(0, 'reach_vinst1',	"Reach Oracle Quest 1",	1000, 5, NOW());
+insert into objectives values(0, 'reach_vinst2',	"Reach Oracle Quest 2",	1000, 5, NOW());
+insert into objectives values(0, 'reach_vinst3',	"Reach Oracle Quest 3",	1000, 5, NOW());
 
 --
 -- Misc goals

@@ -754,7 +754,7 @@ register struct monst *priest;
             //
             // TODO XXX : Hack for LAN! Remove this.
             //
-            grow_team_strength(offer);
+            // grow_team_strength(offer);
 
         } else if (offer < (u.ulevel * 400)) {
             verbalize("Thou art indeed a pious individual.");
@@ -779,7 +779,7 @@ register struct monst *priest;
                     u.ublessed = rn1(3, 2);
             } else
                 u.ublessed++;
-        } else if (offer < (u.ulevel * 800)) {
+        } else {
             verbalize("Thy selfless generosity is deeply appreciated.");
             if (money_cnt(invent) < (offer * 2L) && coaligned) {
                 if (strayed && (moves - u.ucleansed) > 5000L) {
@@ -789,8 +789,6 @@ register struct monst *priest;
                     adjalign(2);
                 }
             }
-        } else {
-            grow_team_strength(offer);
         }
     }
 }

@@ -1014,6 +1014,8 @@ static void _golden_ticket_item(int id, int quan, int spe, int mon)
     oname(obj, "from golden ticket");
 }
 
+boolean FDECL(figurine_location_checks, (struct obj *, coord *, BOOLEAN_P));
+
 static int _spawn_den_dansk(void)
 {
     struct obj *obj;
@@ -1046,7 +1048,15 @@ static int _spawn_den_dansk(void)
         return 0;
     }
 
-    dansk = make_familiar(obj, cc.x, cc.y, FALSE);
+    dansk = make_familiar(obj, cc.x, cc.y, TRUE);
+
+    if(!dansk)
+    {
+        You("must choose a different direction.");
+        dealloc_obj(obj);
+        return 0;
+    }
+
     (void)stop_timer(FIG_TRANSFORM, obj_to_any(obj));
 
     dealloc_obj(obj);
@@ -1200,11 +1210,11 @@ struct ticket_rewards
 
 static const struct ticket_rewards rewards[] = 
 {
-    { "My health keeps running out.", _spawn_health },
-    { "My immune system is so bad.", _spawn_poison_tin },
-    { "I am always hungry.", _spawn_food },
-    { "Everything always hits me.", _spawn_armor },
-    { "I am sooo slow :(", _spawn_speed },
+    { "I want health potions.", _spawn_health },
+    { "I need help with poison.", _spawn_poison_tin },
+    { "I hate starving to death.", _spawn_food },
+    { "My AC is bad :(.", _spawn_armor },
+    { "I want to be fast!", _spawn_speed },
     { "I wish I could kill everything!", _spawn_wand },
     { "I want to change to world.", _spawn_poly },
     { "If only I was strong...", _spawn_gauntlets },

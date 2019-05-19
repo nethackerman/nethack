@@ -599,6 +599,11 @@ register struct monst *mtmp;
 
         if(id) {
             getlin(q, answer);
+            if(0 == answer[0] || '\n' == answer[0] || '\r' == answer[0] || ' ' == answer[0])
+            {
+                return 1;
+            }
+
             if(0 == strcasecmp(a, answer)) {
                 verbalize("Thou hast proven thyself worthy. You may pass!");
                 more();

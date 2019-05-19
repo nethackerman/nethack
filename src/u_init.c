@@ -38,7 +38,7 @@ static struct trobj Archeologist[] = {
     { TOUCHSTONE, 0, GEM_CLASS, 1, 0 },
     { SACK, 0, TOOL_CLASS, 1, 0 },
     { PORTABLE_PORTAL, 0, TOOL_CLASS, 1, 0 },
-    { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
+    // { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
     { PAGER, 0, TOOL_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
@@ -50,7 +50,7 @@ static struct trobj Barbarian[] = {
     { RING_MAIL, 0, ARMOR_CLASS, 1, UNDEF_BLESS },
     { FOOD_RATION, 0, FOOD_CLASS, 1, 0 },
     { PORTABLE_PORTAL, 0, TOOL_CLASS, 1, 0 },
-    { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
+    // { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
     { PAGER, 0, TOOL_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
@@ -62,7 +62,7 @@ static struct trobj Cave_man[] = {
     { ROCK, 0, GEM_CLASS, 3, 0 },             /* yields 18..33 */
     { LEATHER_ARMOR, 0, ARMOR_CLASS, 1, UNDEF_BLESS },
     { PORTABLE_PORTAL, 0, TOOL_CLASS, 1, 0 },
-    { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
+    // { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
     { PAGER, 0, TOOL_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
@@ -79,7 +79,7 @@ static struct trobj Healer[] = {
     { SPE_STONE_TO_FLESH, 0, SPBOOK_CLASS, 1, 1 },
     { APPLE, 0, FOOD_CLASS, 5, 0 },
     { PORTABLE_PORTAL, 0, TOOL_CLASS, 1, 0 },
-    { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
+    // { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
     { PAGER, 0, TOOL_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
@@ -93,7 +93,7 @@ static struct trobj Knight[] = {
     { APPLE, 0, FOOD_CLASS, 10, 0 },
     { CARROT, 0, FOOD_CLASS, 10, 0 },
     { PORTABLE_PORTAL, 0, TOOL_CLASS, 1, 0 },
-    { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
+    // { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
     { PAGER, 0, TOOL_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
@@ -112,7 +112,7 @@ static struct trobj Monk[] = {
      */
     { FORTUNE_COOKIE, 0, FOOD_CLASS, 3, UNDEF_BLESS },
     { PORTABLE_PORTAL, 0, TOOL_CLASS, 1, 0 },
-    { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
+    // { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
     { PAGER, 0, TOOL_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
@@ -125,7 +125,7 @@ static struct trobj Priest[] = {
     { SPRIG_OF_WOLFSBANE, 0, FOOD_CLASS, 1, 0 },
     { UNDEF_TYP, UNDEF_SPE, SPBOOK_CLASS, 2, UNDEF_BLESS },
     { PORTABLE_PORTAL, 0, TOOL_CLASS, 1, 0 },
-    { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
+    // { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
     { PAGER, 0, TOOL_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
@@ -140,7 +140,7 @@ static struct trobj Ranger[] = {
     { CLOAK_OF_DISPLACEMENT, 2, ARMOR_CLASS, 1, UNDEF_BLESS },
     { CRAM_RATION, 0, FOOD_CLASS, 4, 0 },
     { PORTABLE_PORTAL, 0, TOOL_CLASS, 1, 0 },
-    { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
+    // { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
     { PAGER, 0, TOOL_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
@@ -153,7 +153,7 @@ static struct trobj Rogue[] = {
     { LOCK_PICK, 0, TOOL_CLASS, 1, 0 },
     { SACK, 0, TOOL_CLASS, 1, 0 },
     { PORTABLE_PORTAL, 0, TOOL_CLASS, 1, 0 },
-    { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
+    // { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
     { PAGER, 0, TOOL_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
@@ -165,7 +165,7 @@ static struct trobj Samurai[] = {
     { YA, 0, WEAPON_CLASS, 25, UNDEF_BLESS }, /* variable quan */
     { SPLINT_MAIL, 0, ARMOR_CLASS, 1, UNDEF_BLESS },
     { PORTABLE_PORTAL, 0, TOOL_CLASS, 1, 0 },
-    { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
+    // { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
     { PAGER, 0, TOOL_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
@@ -179,7 +179,7 @@ static struct trobj Tourist[] = {
     { EXPENSIVE_CAMERA, UNDEF_SPE, TOOL_CLASS, 1, 0 },
     { CREDIT_CARD, 0, TOOL_CLASS, 1, 0 },
     { PORTABLE_PORTAL, 0, TOOL_CLASS, 1, 0 },
-    { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
+    // { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
     { PAGER, 0, TOOL_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
@@ -189,7 +189,7 @@ static struct trobj Valkyrie[] = {
     { SMALL_SHIELD, 3, ARMOR_CLASS, 1, UNDEF_BLESS },
     { FOOD_RATION, 0, FOOD_CLASS, 1, 0 },
     { PORTABLE_PORTAL, 0, TOOL_CLASS, 1, 0 },
-    { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
+    // { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
     { PAGER, 0, TOOL_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };
@@ -205,7 +205,7 @@ static struct trobj Wizard[] = {
     { SPE_FORCE_BOLT, 0, SPBOOK_CLASS, 1, 1 },
     { UNDEF_TYP, UNDEF_SPE, SPBOOK_CLASS, 1, UNDEF_BLESS },
     { PORTABLE_PORTAL, 0, TOOL_CLASS, 1, 0 },
-    { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
+    // { WARPSTONE, WARP_CHARGES, GEM_CLASS, 1, 0 },
     { PAGER, 0, TOOL_CLASS, 1, 0 },
     { 0, 0, 0, 0, 0 }
 };

@@ -127,6 +127,7 @@ typedef struct branch {
 #define Is_mineend_level(x) (on_level(x, &mineend_level))
 #define Is_sokoend_level(x) (on_level(x, &sokoend_level))
 
+#define In_vinstquest(x) (Is_vinst1_level(x) || Is_vinst2_level(x) || Is_vinst3_level(x))
 #define In_sokoban(x) ((x)->dnum == sokoban_dnum)
 #define Inhell In_hell(&u.uz) /* now gehennom */
 #define In_endgame(x) ((x)->dnum == astral_level.dnum)
