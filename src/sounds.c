@@ -603,8 +603,14 @@ register struct monst *mtmp;
             {
                 return 1;
             }
+            struct nhregex *r = regex_init();
+            if(!regex_compile(a, r)) {
+                verbalize("Hampus broke it :(");
+                regex_free(r);
+                return 1;     
+            }
 
-            if(0 == strcasecmp(a, answer)) {
+            if(regex_match(answer, r)) {
                 verbalize("Thou hast proven thyself worthy. You may pass!");
                 more();
             } else {
@@ -612,6 +618,7 @@ register struct monst *mtmp;
                 more();
                 question_fail(mtmp, id);
             }
+            regex_free(r);
         }
         else {
             verbalize("Wat? I am stood on %d, %d. This is not my home.", mtmp->mx, mtmp->my);

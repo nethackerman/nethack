@@ -1934,7 +1934,22 @@ struct permonst _mons2[] = {
         MR_STONE,
         M1_BREATHLESS | M1_WALLWALK | M1_THICK_HIDE | M1_METALLIVORE,
         M2_HOSTILE | M2_STRONG, 0, CLR_BROWN),
+    MON("Gargantuan grid bug", S_XORN, LVL(8, 12, 1, 0, 0),
+        (G_NOCORPSE | G_NOGEN | G_UNIQ),
+        A(ATTK(AT_BITE, AD_ELEC, 2, 4), ATTK(AT_CLAW, AD_PHYS, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_BUZZ, MZ_LARGE), MR_POISON | MR_STONE,
+        MR_POISON, M1_HUMANOID | M1_HERBIVORE | M1_SEE_INVIS,
+        M2_NOPOLY | M2_HUMAN | M2_MALE | M2_PNAME | M2_HOSTILE | M2_STRONG
+            | M2_NASTY | M2_STALK | M2_COLLECT | M2_MAGIC,
+        M3_WANTSARTI | M3_WAITFORU | M3_INFRAVISIBLE, CLR_MAGENTA),
     /*
+    MON("grid bug", S_XAN, LVL(0, 12, 9, 0, 0),
+        (G_GENO | G_SGROUP | G_NOCORPSE | 3),
+        A(ATTK(AT_BITE, AD_ELEC, 1, 1), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(15, 10, MS_BUZZ, MZ_TINY), MR_ELEC | MR_POISON, 0, M1_ANIMAL,
+        M2_HOSTILE, M3_INFRAVISIBLE, CLR_MAGENTA),
      * Apelike beasts
      */
     /* tameable via banana; does not grow up into ape...

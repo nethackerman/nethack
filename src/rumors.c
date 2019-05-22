@@ -580,7 +580,7 @@ struct monst *oracl;
 
     for(struct obj* obj = invent; obj; obj = obj->nobj) {
         if((0 == (offered & 1)) && (obj->otyp == CORPSE && obj->corpsenm == PM_KEBABDJUR)) {
-            switch(ynq("Is that kebab I smell in your pocket? Would you mind giving it to me so I can open the portal and Den Fulleh Dansk can be stopped?"))
+            switch(ynq("Is that kebab I smell in your pocket? Can I please have it?"))
             {
                 case 'q':
                     return 0;
@@ -608,7 +608,7 @@ struct monst *oracl;
 
     if(0 == offered)
     {
-        pline("Please brave warrior, I required your help to stop Den fulleh Dansk! Would you and your team mate find me some kebab and a yellow onion so I can gain strength to open the portal?");
+        pline("Please brave warrior, I require your help to stop the Gargantuan Grid Bug! Would you and your team mate find me some kebab and a yellow onion so I can gain strength to open the portal?");
         return 0;
     }
 #if 0

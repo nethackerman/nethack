@@ -335,8 +335,8 @@ create table questions(
 	primary key(id)
 );
 
-insert into questions (q,a) values("fisk?", "ja");
-insert into questions (q,a) values("fisk?", "ja");
+insert into questions (q,a) values("Which is heavier, a blessed horse or a cursed carrot?", "(blessed )?horse");
+insert into questions (q,a) values("What monster symbol does a grid bug have?", "[xX]");
 insert into questions (q,a) values("fisk?", "ja");
 insert into questions (q,a) values("fisk?", "ja");
 insert into questions (q,a) values("fisk?", "ja");
