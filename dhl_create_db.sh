@@ -299,7 +299,7 @@ create table questticket(
 );
 
 create table sharedbag(
-	id int not primary key auto_increment,
+	id int primary key auto_increment,
 	clan_id int,
 	otyp int,
 	quan int,
