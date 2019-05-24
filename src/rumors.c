@@ -543,7 +543,7 @@ static void offer_quest_item_and_wait(struct obj *obj)
 
     if(sql_claim_quest_ticket())
     {
-        verbalize("My people need me!");        
+        verbalize("Let's set my plan in motion. Stay safe brave adventurer!");        
         kebaboracle();
     }
 

@@ -524,9 +524,9 @@ static void question_fail(const struct monst *mtmp, int id) {
     x += (y == 15) ? -4 : 2;
 
     static const int monid[] = {
-        PM_ARCHON,
+        PM_GRID_BUG,
         PM_GRID_BUG, PM_JACKAL, PM_KEYSTONE_KOP, PM_ORC_ZOMBIE,
-        PM_ROTHE, PM_MORDOR_ORC, PM_WATER_NYMPH, PM_RAVEN, PM_SOLDIER_ANT,
+        PM_LEPRECHAUN, PM_MORDOR_ORC, PM_ROTHE, PM_GNOME, PM_SOLDIER_ANT,
         // Not used.
         PM_GRID_BUG, PM_GRID_BUG, PM_GRID_BUG, PM_GRID_BUG,
     };
@@ -535,7 +535,11 @@ static void question_fail(const struct monst *mtmp, int id) {
     {
         for(int j = 0; j < 3; ++j)
         {
-            struct monst * const m = makemon(&mons[monid[id]], x + i, y + j - 1, NO_MM_FLAGS);
+            int monspawn = monid[id];
+            if(PM_GNOME == monspawn && 1 == i && 1 == y) {
+                monspawn = PM_GNOME_KING;
+            }
+            struct monst * const m = makemon(&mons[monspawn], x + i, y + j - 1, NO_MM_FLAGS);
             if(m)
             {
                 m->mtame     = 0;

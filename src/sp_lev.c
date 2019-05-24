@@ -2635,8 +2635,10 @@ fill_empty_maze()
             (void) mksobj_at(BOULDER, mm.x, mm.y, TRUE, FALSE);
         }
         for (x = rn2(2); x; x--) {
+        if(!In_vinstquest(&u.uz)) {
             maze1xy(&mm, DRY);
             (void) makemon(&mons[PM_MINOTAUR], mm.x, mm.y, NO_MM_FLAGS);
+        }
         }
         for (x = rnd((int) (12 * mapfact) / 100); x; x--) {
             maze1xy(&mm, DRY);

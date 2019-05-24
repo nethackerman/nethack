@@ -337,14 +337,14 @@ create table questions(
 
 insert into questions (q,a) values("Which is heavier, a blessed horse or a cursed carrot?", "(blessed )?horse");
 insert into questions (q,a) values("What monster symbol does a grid bug have?", "[xX]");
-insert into questions (q,a) values("fisk?", "ja");
-insert into questions (q,a) values("fisk?", "ja");
-insert into questions (q,a) values("fisk?", "ja");
-insert into questions (q,a) values("fisk?", "ja");
-insert into questions (q,a) values("fisk?", "ja");
-insert into questions (q,a) values("fisk?", "ja");
-insert into questions (q,a) values("fisk?", "ja");
-insert into questions (q,a) values("fisk?", "ja");
+insert into questions (q,a) values("What object do you seek?", "(the |a |an )?amulet( of yendor)?");
+insert into questions (q,a) values("There is a name so powerful that when engraved, monsters flee. What name?", "elbereth");
+insert into questions (q,a) values("Name one of the four riders?", "(famine|death|pestilence|pestillence|war)");
+insert into questions (q,a) values("How much wood would a woodchuck chuck if a woodchuck could chuck wood", "ja");
+insert into questions (q,a) values("", "ja");
+insert into questions (q,a) values("What character has the fastest turn and real-time ascension on NAO?", "swaggin[zs]?");
+insert into questions (q,a) values("Fisk?", ".*");
+insert into questions (q,a) values("Fisk?", ".*");
 
 --
 -- Hack shit
