@@ -183,6 +183,25 @@ insert into players values(0, "system", "", "prutt@korv.se", FALSE, null);
 --
 -- Hackshit
 --
+--- breggs hamps pellsson
+--- niss steff marcs 
+--- kalle kalle
+--- erik, martin, filip
+--- magnus
+--- viktor
+--- jens
+
+
+-- pellsson karl b
+-- breggan bjass
+-- steff marco 
+-- jens kalle
+-- erik filip
+-- magnus martin
+-- hampus viktor
+
+
+
 insert into players values(0, "pellsson", md5("12"), "prutt@korv.se", FALSE, null);
 insert into players values(0, "aransentin", md5("12"), "prutt@korv.se", FALSE, null);
 insert into players values(0, "valen", md5("12"), "prutt@korv.se", FALSE, null);
@@ -340,7 +359,7 @@ insert into questions (q,a) values("What monster symbol does a grid bug have?", 
 insert into questions (q,a) values("What object do you seek?", "(the |a |an )?amulet( of yendor)?");
 insert into questions (q,a) values("There is a name so powerful that when engraved, monsters flee. What name?", "elbereth");
 insert into questions (q,a) values("Name one of the four riders?", "(famine|death|pestilence|pestillence|war)");
-insert into questions (q,a) values("How much wood would a woodchuck chuck if a woodchuck could chuck wood", "ja");
+insert into questions (q,a) values("", "ja");
 insert into questions (q,a) values("", "ja");
 insert into questions (q,a) values("What character has the fastest turn and real-time ascension on NAO?", "swaggin[zs]?");
 insert into questions (q,a) values("Fisk?", ".*");
