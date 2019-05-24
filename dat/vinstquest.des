@@ -54,8 +54,8 @@ ENGRAVING:(34, 8),burn,"...oh, and have a bit of booze *before* you read! /Oracl
 CONTAINER:('(',"chest"),not_trapped,(71,16) {
 OBJECT:('/', "sleep"),blessed,name: "Bug spray"
 OBJECT:('!', "healing"),blessed
-OBJECT:('%', random),blessed
-OBJECT:('%', random),blessed
+OBJECT:('%', "food ration")
+OBJECT:('%', "food ration")
 OBJECT:('?', "enchant armor"),blessed,name: "Iron skin"
 }
 
