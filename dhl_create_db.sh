@@ -318,8 +318,7 @@ create table sharedbag(
 	age bigint,
 	named varchar(128),
 	removed int default 0,
-	added timestamp default NOW(),
-	primary key(id));
+	added timestamp default NOW());
 
 create table messages(
 	id int not null auto_increment,
