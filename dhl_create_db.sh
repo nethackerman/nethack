@@ -178,71 +178,152 @@ insert into objectives values(0, 'curse_ascend',	"Ascend with curse item", 2000,
 -- System user
 --
 insert into players values(0, "system", "", "prutt@korv.se", FALSE, null);
-
+set @system_id = LAST_INSERT_ID();
 
 --
 -- Hackshit
 --
---- breggs hamps pellsson
---- niss steff marcs 
---- kalle kalle
---- erik, martin, filip
---- magnus
---- viktor
---- jens
 
-
--- pellsson karl b
--- breggan bjass
--- steff marco 
--- jens kalle
--- erik filip
--- magnus martin
--- hampus viktor
-
-
-
+-- Pellsson & Karl b
 insert into players values(0, "pellsson", md5("12"), "prutt@korv.se", FALSE, null);
-insert into players values(0, "aransentin", md5("12"), "prutt@korv.se", FALSE, null);
-insert into players values(0, "valen", md5("12"), "prutt@korv.se", FALSE, null);
-insert into players values(0, "balmer00", md5("bajskorv"), "prutt@korv.se", FALSE, null);
+set @pellsson_id = LAST_INSERT_ID();
 
-insert into clans values(0, 1, 2, "Pantbanken", null);
-insert into clan_members values(0, 1, 2, 'filled', null);
-insert into clan_members values(0, 1, 3, 'filled', null);
-insert into clan_members values(0, 1, 4, 'filled', null);
-insert into clan_members values(0, 1, 5, 'filled', null);
+-- karl bergstrom
+insert into players values(0, "kae", md5("12"), "prutt@korv.se", FALSE, null);
+set @kae_id = LAST_INSERT_ID();
 
+-- breggan
 insert into players values(0, "breggan", md5("12"), "prutt@korv.se", FALSE, null);
-insert into players values(0, "gorbiz", md5("12"), "prutt@korv.se", FALSE, null);
+set @breggan_id = LAST_INSERT_ID();
+
+-- bajset
 insert into players values(0, "bJazz", md5("12"), "prutt@korv.se", FALSE, null);
-insert into players values(0, "balmer01", md5("bajskorv"), "prutt@korv.se", FALSE, null);
+set @bjazz_id = LAST_INSERT_ID();
 
-insert into clans values(0, 1, 2, "Nisses Lag", null);
-insert into clan_members values(0, 2, 6, 'filled', null);
-insert into clan_members values(0, 2, 7, 'filled', null);
-insert into clan_members values(0, 2, 8, 'filled', null);
-insert into clan_members values(0, 2, 9, 'filled', null);
-
-insert into clans values(0, 1, 4, "Ronald McDonald Trump", null);
-insert into players values(0, "Herde", md5("12"), "prutt@korv.se", FALSE, null);
-insert into players values(0, "Erik2", md5("12"), "prutt@korv.se", FALSE, null);
-insert into players values(0, "menvafan", md5("12"), "prutt@korv.se", FALSE, null);
+-- STEFANHELLSBORN
 insert into players values(0, "CeleryMan", md5("12"), "prutt@korv.se", FALSE, null);
+set @celeryman_id = LAST_INSERT_ID();
+
+-- Macroman
+insert into players values(0, "Najarana", md5("12"), "prutt@korv.se", FALSE, null);
+set @najarana_id = LAST_INSERT_ID();
+
+-- Jensson
+insert into players values(0, "Aransentin", md5("12"), "prutt@korv.se", FALSE, null);
+set @aransentin_id = LAST_INSERT_ID();
+
+-- Kalle kurt
+insert into players values(0, "gorbiz", md5("12"), "prutt@korv.se", FALSE, null);
+set @gorbiz_id = LAST_INSERT_ID();
+
+-- Erik1
+insert into players values(0, "menvafan", md5("12"), "prutt@korv.se", FALSE, null);
+set @menvafan_id = LAST_INSERT_ID();
+
+-- Filip
+insert into players values(0, "erik3", md5("12"), "prutt@korv.se", FALSE, null);
+set @erik3_id = LAST_INSERT_ID();
+
+-- Magnus
+insert into players values(0, "Magnum", md5("12"), "prutt@korv.se", FALSE, null);
+set @magnum_id = LAST_INSERT_ID();
+
+-- Martin
+insert into players values(0, "erik4", md5("12"), "prutt@korv.se", FALSE, null);
+set @erik4_id = LAST_INSERT_ID();
+
+-- DET AR HAMPOS
+insert into players values(0, "Herde", md5("12"), "prutt@korv.se", FALSE, null);
+set @herde_id = LAST_INSERT_ID();
+
+-- viktor
+insert into players values(0, "Viktor", md5("12"), "prutt@korv.se", FALSE, null);
+set @viktor_id = LAST_INSERT_ID();
+
+insert into players values(0, "balmer00", md5("bajskorv"), "prutt@korv.se", FALSE, null);
+set @blamer00 = LAST_INSERT_ID();
+insert into players values(0, "balmer01", md5("bajskorv"), "prutt@korv.se", FALSE, null);
+set @blamer01 = LAST_INSERT_ID();
 insert into players values(0, "balmer02", md5("bajskorv"), "prutt@korv.se", FALSE, null);
+set @blamer02 = LAST_INSERT_ID();
+insert into players values(0, "balmer03", md5("bajskorv"), "prutt@korv.se", FALSE, null);
+set @blamer03 = LAST_INSERT_ID();
+insert into players values(0, "balmer04", md5("bajskorv"), "prutt@korv.se", FALSE, null);
+set @blamer04 = LAST_INSERT_ID();
+insert into players values(0, "balmer05", md5("bajskorv"), "prutt@korv.se", FALSE, null);
+set @blamer05 = LAST_INSERT_ID();
+insert into players values(0, "balmer06", md5("bajskorv"), "prutt@korv.se", FALSE, null);
+set @blamer06 = LAST_INSERT_ID();
+insert into players values(0, "balmer07", md5("bajskorv"), "prutt@korv.se", FALSE, null);
+set @blamer07 = LAST_INSERT_ID();
 
-insert into clan_members values(0, 3, 10, 'filled', null);
-insert into clan_members values(0, 3, 11, 'filled', null);
-insert into clan_members values(0, 3, 12, 'filled', null);
-insert into clan_members values(0, 3, 13, 'filled', null);
-insert into clan_members values(0, 3, 14, 'filled', null);
+insert into clans (game_id, owner_id, name, added) values (1, @pellsson_id, "Pantbanken", NOW());
+set @clan0_id = LAST_INSERT_ID();
+insert into clan_members (clan_id, player_id, slot_type, added) values (
+	(@clan0_id, @pellsson_id, 'filled', NOW()),
+	(@clan0_id, @kae_id, 'filled', NOW()),
+	(@clan0_id, @balmer00_id, 'filled', NOW())
+);
 
--- insert into players values(0, "Najarana", md5("12"), "prutt@korv.se", FALSE, null);
+insert into clans (game_id, owner_id, name, added) values (1, @breggan_id, "Nisses Lag", NOW());
+set @clan1_id = LAST_INSERT_ID();
+insert into clan_members (clan_id, player_id, slot_type, added) values (
+	(@clan1_id, @breggan_id, 'filled', NOW()),
+	(@clan1_id, @bjazz_id, 'filled', NOW()),
+	(@clan1_id, @balmer01_id, 'filled', NOW())
+);
+
+insert into clans (game_id, owner_id, name, added) values (1, @najarana_id, "Team X", NOW());
+set @clan2_id = LAST_INSERT_ID();
+insert into clan_members (clan_id, player_id, slot_type, added) values (
+	(@clan2_id, @najarana_id, 'filled', NOW()),
+    (@clan2_id, @celeryman_id, 'filled', NOW()),
+    (@clan2_id, @balmer02_id, 'filled', NOW())
+);
+
+insert into clans (game_id, owner_id, name, added) values (1, @aransentin_id, "Romarriket", NOW());
+set @clan3_id = LAST_INSERT_ID();
+insert into clan_members (clan_id, player_id, slot_type, added) values (
+	(@clan3_id, @aransentin_id, 'filled', NOW()),
+	(@clan3_id, @gorbiz_id, 'filled', NOW()),
+	(@clan3_id, @balmer03_id, 'filled', NOW())
+);
+
+insert into clans (game_id, owner_id, name, added) values (1, @menvafan_id, "Erikarna", NOW());
+set @clan4_id = LAST_INSERT_ID();
+insert into clan_members (clan_id, player_id, slot_type, added) values (
+	(@clan4_id, @menvafan_id, 'filled', NOW()),
+	(@clan4_id, @erik3_id, 'filled', NOW()),
+	(@clan4_id, @balmer04_id, 'filled', NOW())
+);
+
+insert into clans (game_id, owner_id, name, added) values (1, @magnum_id, "M&M", NOW());
+set @clan5_id = LAST_INSERT_ID();
+insert into clan_members (clan_id, player_id, slot_type, added) values (
+	(@clan5_id, @magnum_id, 'filled', NOW()),
+	(@clan5_id, @erik4_id, 'filled', NOW()),
+	(@clan5_id, @balmer05_id, 'filled', NOW())
+);
+
+insert into clans (game_id, owner_id, name, added) values (1, @herde_id, "Vinstlaget", NOW());
+set @clan6_id = LAST_INSERT_ID();
+insert into clan_members (clan_id, player_id, slot_type, added) values (
+    (@clan6_id, @herde_id, 'filled', NOW()),
+    (@clan6_id, @viktor_id, 'filled', NOW()),
+    (@clan6_id, @balmer06_id, 'filled', NOW())
+);
+
+---WTFFF ISTHis shit??:L::::;/vvvv
+
 
 insert into games values(0, "Test Tournament", NOW(), DATE_ADD(NOW(), INTERVAL 2000 HOUR), NOW());
-insert into game_participants values(0, 1, 1, NOW());
-insert into game_participants values(0, 1, 2, NOW());
-insert into game_participants values(0, 1, 3, NOW());
+insert into game_participants (game_id, clan_id, added) values (1, @clan0_id, NOW());
+insert into game_participants (game_id, clan_id, added) values (1, @clan1_id, NOW());
+insert into game_participants (game_id, clan_id, added) values (1, @clan2_id, NOW());
+insert into game_participants (game_id, clan_id, added) values (1, @clan3_id, NOW());
+insert into game_participants (game_id, clan_id, added) values (1, @clan4_id, NOW());
+insert into game_participants (game_id, clan_id, added) values (1, @clan5_id, NOW());
+insert into game_participants (game_id, clan_id, added) values (1, @clan6_id, NOW());
 
 drop database if exists nhtour_game_1;
 create database nhtour_game_1;
@@ -362,9 +443,7 @@ insert into questions (q,a) values("What intrinsic (resistance) is helpful again
 insert into questions (q,a) values("\"You hear the chime of a cash register\", why?", "shop");
 insert into questions (q,a) values("What character has the fastest turn and real-time ascension on NAO?", "swaggin[zs]?");
 insert into questions (q,a) values("What attribute affects your hitpoints?", "con?(stitution)?");
-insert into questions (q,a) values("What is the highest possible strength?" "25");
-insert into questions (q,a) values("What " "");
-insert into questions (q,a) values("" "");
+insert into questions (q,a) values("What is the highest possible strength?", "25");
 
 --
 -- Hack shit

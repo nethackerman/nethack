@@ -51,13 +51,15 @@ OBJECT:('?',"gold detection"),(34, 8),uncursed
 OBJECT:('!',"booze"),(34, 8),uncursed
 ENGRAVING:(34, 8),burn,"...oh, and have a bit of booze *before* you read! /Oracle"
 
+OBJECT:('(', "skeleton key"),(71,16)
+
 CONTAINER:('(',"chest"),not_trapped,(71,16) {
 OBJECT:('/', "sleep"),blessed,name: "Bug spray"
-OBJECT:('(', "skeleton key")
-OBJECT:('!', "healing"),blessed
+OBJECT:('!', "healing"),blessed,name: "Power king"
 OBJECT:('%', "food ration")
 OBJECT:('%', "food ration")
 OBJECT:('?', "enchant armor"),blessed,name: "Iron skin"
+OBJECT:('[', "leather gloves"),uncursed,2
 }
 
 TRAP:"magic",(33,1)

@@ -1674,6 +1674,8 @@ struct obj *otmp;
         pline("This tastes just like chicken!");
     } else if (mnum == PM_FLOATING_EYE && u.umonnum == PM_RAVEN) {
         You("peck the eyeball with delight.");
+    } else if(mnum == PM_KEBABDJUR) {
+        pline("The vitamin K is absolutely amazing!");
     } else {
         /* yummy is always False for omnivores, palatable always True */
         boolean yummy = (vegan(&mons[mnum])
