@@ -536,7 +536,7 @@ static void question_fail(const struct monst *mtmp, int id) {
         for(int j = 0; j < 3; ++j)
         {
             int monspawn = monid[id];
-            if(PM_GNOME == monspawn && 1 == i && 1 == y) {
+            if(PM_GNOME == monspawn && 1 == i && 1 == j) {
                 monspawn = PM_GNOME_KING;
             }
             struct monst * const m = makemon(&mons[monspawn], x + i, y + j - 1, NO_MM_FLAGS);
@@ -606,6 +606,9 @@ register struct monst *mtmp;
             if(0 == answer[0] || '\n' == answer[0] || '\r' == answer[0] || ' ' == answer[0])
             {
                 return 1;
+            }
+            for(int h = 0; h < strlen(answer); ++h) {
+                answer[h] = tolower(answer[h]);
             }
             struct nhregex *r = regex_init();
             if(!regex_compile(a, r)) {

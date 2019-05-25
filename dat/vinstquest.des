@@ -53,6 +53,7 @@ ENGRAVING:(34, 8),burn,"...oh, and have a bit of booze *before* you read! /Oracl
 
 CONTAINER:('(',"chest"),not_trapped,(71,16) {
 OBJECT:('/', "sleep"),blessed,name: "Bug spray"
+OBJECT:('(', "skeleton key")
 OBJECT:('!', "healing"),blessed
 OBJECT:('%', "food ration")
 OBJECT:('%', "food ration")
@@ -415,7 +416,7 @@ SHUFFLE: $object
 $place = { (04,02),(58,02),(04,14),(58,14) }
 SHUFFLE: $place
 
-$monster = monster: { 's','b','d','k','G','w',':','M','o','Z' }
+$monster = monster: { 's','b','G','k','h','m','G','M','o','Z' }
 SHUFFLE: $monster
 
 
@@ -511,6 +512,8 @@ OBJECT:random
 OBJECT:random
 OBJECT:random
 }
+
+DOOR:locked,(28,08)
 
 OBJECT:('?', "scare monster"),cursed,(55,08)
 CONTAINER:('(',"chest"),not_trapped,(55,08) {

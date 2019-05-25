@@ -358,11 +358,13 @@ insert into questions (q,a) values("What monster symbol does a grid bug have?", 
 insert into questions (q,a) values("What object do you seek?", "(the |a |an )?amulet( of yendor)?");
 insert into questions (q,a) values("There is a name so powerful that when engraved, monsters flee. What name?", "elbereth");
 insert into questions (q,a) values("Name one of the four riders?", "(famine|death|pestilence|pestillence|war)");
-insert into questions (q,a) values("", "ja");
-insert into questions (q,a) values("", "ja");
+insert into questions (q,a) values("What intrinsic (resistance) is helpful against an energy vortex?", "(lightning|shock)( resistance| resistant| intrinsic)?");
+insert into questions (q,a) values("\"You hear the chime of a cash register\", why?", "shop");
 insert into questions (q,a) values("What character has the fastest turn and real-time ascension on NAO?", "swaggin[zs]?");
-insert into questions (q,a) values("Fisk?", ".*");
-insert into questions (q,a) values("Fisk?", ".*");
+insert into questions (q,a) values("What attribute affects your hitpoints?", "con?(stitution)?");
+insert into questions (q,a) values("What is the highest possible strength?" "25");
+insert into questions (q,a) values("What " "");
+insert into questions (q,a) values("" "");
 
 --
 -- Hack shit
