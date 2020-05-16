@@ -259,59 +259,59 @@ set @blamer07 = LAST_INSERT_ID();
 
 insert into clans (game_id, owner_id, name, added) values (1, @pellsson_id, "Pantbanken", NOW());
 set @clan0_id = LAST_INSERT_ID();
-insert into clan_members (clan_id, player_id, slot_type, added) values (
+insert into clan_members (clan_id, player_id, slot_type, added) values
 	(@clan0_id, @pellsson_id, 'filled', NOW()),
 	(@clan0_id, @kae_id, 'filled', NOW()),
 	(@clan0_id, @balmer00_id, 'filled', NOW())
-);
+;
 
 insert into clans (game_id, owner_id, name, added) values (1, @breggan_id, "Nisses Lag", NOW());
 set @clan1_id = LAST_INSERT_ID();
-insert into clan_members (clan_id, player_id, slot_type, added) values (
+insert into clan_members (clan_id, player_id, slot_type, added) values
 	(@clan1_id, @breggan_id, 'filled', NOW()),
 	(@clan1_id, @bjazz_id, 'filled', NOW()),
 	(@clan1_id, @balmer01_id, 'filled', NOW())
-);
+;
 
 insert into clans (game_id, owner_id, name, added) values (1, @najarana_id, "Team X", NOW());
 set @clan2_id = LAST_INSERT_ID();
-insert into clan_members (clan_id, player_id, slot_type, added) values (
+insert into clan_members (clan_id, player_id, slot_type, added) values 
 	(@clan2_id, @najarana_id, 'filled', NOW()),
     (@clan2_id, @celeryman_id, 'filled', NOW()),
     (@clan2_id, @balmer02_id, 'filled', NOW())
-);
+;
 
 insert into clans (game_id, owner_id, name, added) values (1, @aransentin_id, "Romarriket", NOW());
 set @clan3_id = LAST_INSERT_ID();
-insert into clan_members (clan_id, player_id, slot_type, added) values (
+insert into clan_members (clan_id, player_id, slot_type, added) values 
 	(@clan3_id, @aransentin_id, 'filled', NOW()),
 	(@clan3_id, @gorbiz_id, 'filled', NOW()),
 	(@clan3_id, @balmer03_id, 'filled', NOW())
-);
+;
 
 insert into clans (game_id, owner_id, name, added) values (1, @menvafan_id, "Erikarna", NOW());
 set @clan4_id = LAST_INSERT_ID();
-insert into clan_members (clan_id, player_id, slot_type, added) values (
+insert into clan_members (clan_id, player_id, slot_type, added) values 
 	(@clan4_id, @menvafan_id, 'filled', NOW()),
 	(@clan4_id, @erik3_id, 'filled', NOW()),
 	(@clan4_id, @balmer04_id, 'filled', NOW())
-);
+;
 
 insert into clans (game_id, owner_id, name, added) values (1, @magnum_id, "M&M", NOW());
 set @clan5_id = LAST_INSERT_ID();
-insert into clan_members (clan_id, player_id, slot_type, added) values (
+insert into clan_members (clan_id, player_id, slot_type, added) values 
 	(@clan5_id, @magnum_id, 'filled', NOW()),
 	(@clan5_id, @erik4_id, 'filled', NOW()),
 	(@clan5_id, @balmer05_id, 'filled', NOW())
-);
+;
 
 insert into clans (game_id, owner_id, name, added) values (1, @herde_id, "Vinstlaget", NOW());
 set @clan6_id = LAST_INSERT_ID();
-insert into clan_members (clan_id, player_id, slot_type, added) values (
+insert into clan_members (clan_id, player_id, slot_type, added) values 
     (@clan6_id, @herde_id, 'filled', NOW()),
     (@clan6_id, @viktor_id, 'filled', NOW()),
     (@clan6_id, @balmer06_id, 'filled', NOW())
-);
+;
 
 ---WTFFF ISTHis shit??:L::::;/vvvv
 
